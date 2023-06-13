@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa9bed0f8431aa44adb3357aeccadd8, type: 3}
+  m_Name: FrostFlowerContent
+  m_EditorClassIdentifier: Assembly-CSharp:Niantic.ARVoyage.Vps:LocalizedContentAsset
+  vpsDataEntry:
+    mapId: 
+    label: Frost Flower
+    includeInDebugMenu: 0
+    injectLocalizationTarget: 0
+    localizationTarget:
+      _identifier: 
+      _name: 
+      _center:
+        lat_degrees: 0
+        lng_degrees: 0
+      _imageURL: 
+    latitude: 0
+    longitude: 0
+    isVisibleOnMap: 1
+    imageUrl: 
+    imageOverride: {fileID: 0}
+    bespokeEnabled: 1
+    prefab: {fileID: 5839018467935225473, guid: 0b16d955b32c64deea2a359c2c3bc00e,
+      type: 3}
+  prefab: {fileID: 5839018467935225473, guid: 0b16d955b32c64deea2a359c2c3bc00e, type: 3}

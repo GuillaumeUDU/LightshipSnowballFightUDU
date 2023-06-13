@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Allow Splats
+  - BlueGoal
+  - RedGoal
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - ARDK_MockWorld
+  - AR Mesh
+  - AR Planes
+  - AR Player
+  - AR Enemy
+  - AR Snowball
+  - AR Snow Debris
+  - Transparent With Depth
+  - 
+  - Walkabout Perimeter
+  - Walkabout Interior
+  - 
+  - VFX Overlay
+  - VFX Overlay Opaque
+  - VPS Intro
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0

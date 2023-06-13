@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa9bed0f8431aa44adb3357aeccadd8, type: 3}
+  m_Name: WillieMaysTouristContentSO
+  m_EditorClassIdentifier: Assembly-CSharp:Niantic.ARVoyage.Vps:LocalizedContentAsset
+  vpsDataEntry:
+    includeInDebugMenu: 1
+    identifier: dcddf1c1eae4b708ee9f3c3c61d5a588f2f32467
+    name: Willie Howard Mays Jr.
+    latitudeLongitude:
+      lat_degrees: 37.778042
+      lng_degrees: -122.391393
+    imageUrl: 
+    hintImage: {fileID: 2800000, guid: 37c5875a64fb44c168844fc8d1078306, type: 3}
+    bespokeEnabled: 1
+    prefab: {fileID: 4362078776445416984, guid: 57d29a48a691146668843332671423b2,
+      type: 3}
+    injectIntoCoverageResults: 0

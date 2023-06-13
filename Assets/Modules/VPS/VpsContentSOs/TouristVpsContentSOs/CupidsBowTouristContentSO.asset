@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa9bed0f8431aa44adb3357aeccadd8, type: 3}
+  m_Name: CupidsBowTouristContentSO
+  m_EditorClassIdentifier: 
+  vpsDataEntry:
+    includeInDebugMenu: 1
+    identifier: f04f593d6d6f2028f8d67076dfe11204f9776015
+    name: Cupid's Bow
+    latitudeLongitude:
+      lat_degrees: 37.791836
+      lng_degrees: -122.389952
+    imageUrl: 
+    hintImage: {fileID: 2800000, guid: 43acbed11cf3b4c1584e2d3f9de3adbd, type: 3}
+    bespokeEnabled: 1
+    prefab: {fileID: 4362078776445416984, guid: d8c57f71a99c647e8a77c8bab72b869b,
+      type: 3}
+    injectIntoCoverageResults: 0

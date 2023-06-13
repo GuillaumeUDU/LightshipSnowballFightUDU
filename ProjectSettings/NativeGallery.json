@@ -1,0 +1,6 @@
+{
+    "AutomatedSetup": true,
+    "PhotoLibraryUsageDescription": "The app requires access to Photos to interact with it.",
+    "PhotoLibraryAdditionsUsageDescription": "We’ll need access to save the photos you take in the experience to your device.",
+    "DontAskLimitedPhotosPermissionAutomaticallyOnIos14": true
+}

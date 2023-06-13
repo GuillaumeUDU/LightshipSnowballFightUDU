@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa9bed0f8431aa44adb3357aeccadd8, type: 3}
+  m_Name: ChinatownGateTouristContentSO
+  m_EditorClassIdentifier: 
+  vpsDataEntry:
+    includeInDebugMenu: 1
+    identifier: 4cb15f746bf7397ad8f0fdd8a774d48a564d160c
+    name: Lion Statue at Chinatown Gate
+    latitudeLongitude:
+      lat_degrees: 37.79069
+      lng_degrees: -122.405551
+    imageUrl: 
+    hintImage: {fileID: 2800000, guid: 6dd94fb6d73f04c069c8795e11204388, type: 3}
+    bespokeEnabled: 1
+    prefab: {fileID: 4362078776445416984, guid: 9357ffd736aef4bf083ecea3545f6091,
+      type: 3}
+    injectIntoCoverageResults: 0

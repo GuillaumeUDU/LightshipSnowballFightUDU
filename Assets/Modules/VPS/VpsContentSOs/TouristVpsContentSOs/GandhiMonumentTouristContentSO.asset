@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa9bed0f8431aa44adb3357aeccadd8, type: 3}
+  m_Name: GandhiMonumentTouristContentSO
+  m_EditorClassIdentifier: 
+  vpsDataEntry:
+    includeInDebugMenu: 1
+    identifier: d7c2ab4d008f83350191e1922259f3abe1d7751c
+    name: Gandhi Monument
+    latitudeLongitude:
+      lat_degrees: 37.795333
+      lng_degrees: -122.392394
+    imageUrl: 
+    hintImage: {fileID: 2800000, guid: 4b691b6ce0ce348bba6b7e370b42b0e9, type: 3}
+    bespokeEnabled: 1
+    prefab: {fileID: 4362078776445416984, guid: 57001f5b9158b4fbd84cff1d22ff1ac6,
+      type: 3}
+    injectIntoCoverageResults: 0

@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5695406649494002796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7012242819433601843}
+  - component: {fileID: 412894355038262877}
+  m_Layer: 0
+  m_Name: VpsCoverageManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7012242819433601843
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695406649494002796}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &412894355038262877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695406649494002796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb2f51742209dc94087703a09df8d208, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coverageClientRuntime: 1
+  mockResponses: {fileID: 11400000, guid: 107c27603c8c349f18af4098a4f99ff7, type: 2}
+  vpsContentAssets:
+  - {fileID: 11400000, guid: e1cb0a9e40ce84463a42e2af2e61cbd3, type: 2}
+  - {fileID: 11400000, guid: db5516fea90b4426e95a7951be0d1b5d, type: 2}
+  - {fileID: 11400000, guid: 5827f59480efc471ba3b3418ef8714ac, type: 2}
+  - {fileID: 11400000, guid: 3d988da031b1045bda7290cbe820e89c, type: 2}
+  - {fileID: 11400000, guid: 42098abb6053e4e238d961884140f160, type: 2}
+  defaultVpsContentAsset: {fileID: 11400000, guid: 1970ddaba315a4ab1962302dc19ec929,
+    type: 2}
+  CoverageQueryStateChange:
+    m_PersistentCalls:
+      m_Calls: []
+  CoverageQueryError:
+    m_PersistentCalls:
+      m_Calls: []

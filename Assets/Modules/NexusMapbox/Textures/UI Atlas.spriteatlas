@@ -1,0 +1,120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI Atlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 3
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 90
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 8
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 913d35562a4da4386b6df35e0293055d, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 0c2bd4205c02d44a39d36deb07afd2b9, type: 3}
+  - {fileID: 21300000, guid: f3994b2032fc14a52969f907790cdfd3, type: 3}
+  - {fileID: 21300000, guid: a0590b21cedf34479a98f33acd775654, type: 3}
+  - {fileID: 21300000, guid: 92ecee023d960413595829ccc519281f, type: 3}
+  - {fileID: 21300000, guid: 090a347229dd64eeda76141d64ffad29, type: 3}
+  - {fileID: 21300000, guid: 317f19a2f662346a0aadb3651e7e0402, type: 3}
+  - {fileID: 21300000, guid: 8815bc5376ea34584af38f7e7539497a, type: 3}
+  - {fileID: 21300000, guid: cf43d283a9bd94fee819c6d35f26b4f4, type: 3}
+  - {fileID: 21300000, guid: 813ef9f3d20c34d4ca4c1db1b2cb4504, type: 3}
+  - {fileID: 21300000, guid: 1c10c2341c5e84c76ae4665488bc4bf0, type: 3}
+  - {fileID: 21300000, guid: fc4c904597e4e4c3ba524771b467b9e5, type: 3}
+  - {fileID: 21300000, guid: e51186061bfb748beb506833345beb8b, type: 3}
+  - {fileID: 21300000, guid: e78f20664ef7a4f1787bc9985ea23d28, type: 3}
+  - {fileID: 21300000, guid: 58affdd6e801144aaa98eed97b924f0d, type: 3}
+  - {fileID: 21300000, guid: dd297f772d10542ee9ebc0719847e996, type: 3}
+  - {fileID: 21300000, guid: a75068281ba244a66a272bd017871a0b, type: 3}
+  - {fileID: 21300000, guid: 17ade2d84ca8e44f1b1097a70a53ece6, type: 3}
+  - {fileID: 21300000, guid: 31d74ad89ef4647dabcf265006ca6583, type: 3}
+  - {fileID: 21300000, guid: 31bf7de8fd45b475fb73b2bfd1f309cb, type: 3}
+  - {fileID: 21300000, guid: 5ea82b191138b46fca0e5931b382d029, type: 3}
+  - {fileID: 21300000, guid: a612ef39acda940e787a5ced685607e4, type: 3}
+  - {fileID: 21300000, guid: 91051cd99c0284c579ab973e2907ffe2, type: 3}
+  - {fileID: 21300000, guid: bf79e56aa15b445e08e3d03854552c58, type: 3}
+  - {fileID: 21300000, guid: 2848d66b4c903419d98166c611240348, type: 3}
+  - {fileID: 21300000, guid: e830196bd0e7044718ca955467a288ea, type: 3}
+  - {fileID: 21300000, guid: 9b334cab644904da8a14e1635906da99, type: 3}
+  - {fileID: 21300000, guid: 9bbef4ad5cdda498594ef22b9b5c96ec, type: 3}
+  - {fileID: 21300000, guid: 74f8903e4000a4664879d37846f3ec09, type: 3}
+  - {fileID: 21300000, guid: 9a72067ebf11d4853ba2278b46fead40, type: 3}
+  - {fileID: 21300000, guid: 3954d0ae5433840308e2fe7c975b7bd6, type: 3}
+  - {fileID: 21300000, guid: a1efc52fb963b44b8aea2cbb620f57ef, type: 3}
+  - {fileID: 21300000, guid: 67cce85f9e68e48f39336b2445628f6d, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - rotate
+  - cycle
+  - capture-button-shadow
+  - shuffle
+  - view-list
+  - ghost-totem
+  - megaphone
+  - spinner
+  - view-map
+  - arrow
+  - drag-xz
+  - circle
+  - person-small
+  - sb-burger
+  - drag-y
+  - X
+  - headphones
+  - camera
+  - back
+  - eye
+  - incomplete-totem
+  - compass
+  - report-flag
+  - small-filled-person
+  - complete-totem
+  - external-link
+  - share
+  - re-center
+  - 1px-corner
+  - avatar-circle
+  - avatar-heart
+  - warning-triangle
+  m_RenderDataMap: {}
+  m_Tag: UI Atlas
+  m_IsVariant: 0
