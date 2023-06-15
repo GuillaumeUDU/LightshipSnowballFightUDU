@@ -26,11 +26,11 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
 
         // loop check to see if a popup or an enemy that is getting interacted with (NEEDED)
 
-        GameObject startButtonGO = GameObject.Find("ButtonStart");
+        GameObject snowballToss = GameObject.Find("SnowballTossButton");
 
-        if (startButtonGO != null)
+        if (snowballToss != null)
         {
-            InteractionWithPopup(startButtonGO);
+            InteractionWithPopup(snowballToss);
         }
         else
         {

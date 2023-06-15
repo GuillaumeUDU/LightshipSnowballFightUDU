@@ -89,7 +89,7 @@ namespace Niantic.ARVoyage.SnowballToss
         {
             if (args.BlocksUpdated != null)
             {
-                Debug.Log("StateScanning found mesh");
+                //Debug.Log("StateScanning found mesh");
                 foundMesh = true;
             }
         }

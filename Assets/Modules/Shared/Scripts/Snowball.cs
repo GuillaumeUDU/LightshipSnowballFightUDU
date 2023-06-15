@@ -67,7 +67,12 @@ namespace Niantic.ARVoyage
         private int impactCount = 0;            // Current number of impacts.
         private float lastImpact = 0;           // Moment of previous impact.
 
+        private bool triggerPressed;
+        private float consolePeakAcceleration;
+        private float consoleCurrentAcceleration;
+
         private AudioManager audioManager;
+        private AbstractDataStream uduConsole;
 
         public string SpawnerDescription { get; private set; }
 
@@ -80,6 +85,25 @@ namespace Niantic.ARVoyage
             audioManager = SceneLookup.Get<AudioManager>();
 
             ShowVFX(false);
+
+            uduConsole = ConsoleIntegration.Instance.uduConsoleDatastream;
+        }
+
+        private void Start()
+        {
+            EventsSystemHandler.Instance.onTriggerPressTriggerButton += TriggerButtonPressed;
+            EventsSystemHandler.Instance.onTriggerPressSqueezeButton += TriggerButtonReleased;
+        }
+
+        private void TriggerButtonPressed()
+        {
+            triggerPressed = true;
+            consolePeakAcceleration = 0;
+        }
+
+        private void TriggerButtonReleased()
+        {
+            triggerPressed = false;
         }
 
         public void InitSnowball(string spawnerDescription, Transform newParent = null)
@@ -146,6 +170,20 @@ namespace Niantic.ARVoyage
                     Expire(destroy: true);
                 }
             }
+
+            ConsolePickAcceleration();
+        }
+
+        private void ConsolePickAcceleration()
+        {
+            // Update the variable value
+            consoleCurrentAcceleration = uduConsole.GetAcceleration().magnitude;
+
+            if (triggerPressed && consoleCurrentAcceleration > consolePeakAcceleration)
+            {
+                // Update the max value if the current value is higher
+                consolePeakAcceleration = consoleCurrentAcceleration;
+            }
         }
 
 
@@ -184,7 +222,6 @@ namespace Niantic.ARVoyage
         {
             Vector3 force = transform.forward * tossForce;
             Vector3 torque = transform.right * Random.Range(1, 3);
-
             TossSnowball(tossAngle, force, torque);
 
             EventLocallySpawnedSnowballTossed.Invoke(this, tossAngle, force, torque);
@@ -210,7 +247,7 @@ namespace Niantic.ARVoyage
             tossRotation.x -= tossAngle;
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
-            snowballRigidbody.AddForce(this.transform.forward * tossForce);
+            snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             snowballRigidbody.AddTorque(this.transform.right * Random.Range(1, 3));
 
             // Set snowball lifetime duration
@@ -223,6 +260,23 @@ namespace Niantic.ARVoyage
             // Use PlayAudioAtPosition instead of PlayAudioOnObject, 
             // since snowball may burst before throw SFX is done
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
+        }
+        float ConvertValue(float value)
+        {
+            float minValue = 900f;
+            float maxValue = 5000f;
+            float minTargetValue = 15f;
+            float maxTargetValue = 35f;
+
+            // Calculate the percentage of the original value within the range
+            float percentage = (value - minValue) / (maxValue - minValue);
+
+            // Map the percentage to the target range
+            float targetValue = minTargetValue + (maxTargetValue - minTargetValue) * percentage;
+
+            Debug.Log("SNOWBALL SPEED:" + targetValue + " , CONSOLE MAGNITUDE:" + uduConsole.GetAcceleration().magnitude);
+
+            return targetValue;
         }
 
         void OnCollisionEnter(Collision collision)
