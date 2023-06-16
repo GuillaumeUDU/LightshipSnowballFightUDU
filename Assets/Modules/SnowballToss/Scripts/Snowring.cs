@@ -322,9 +322,9 @@ namespace Niantic.ARVoyage.SnowballToss
             if (validPosition != Vector3.zero)
             {
                 // Put the snowring at the valid position
-                Debug.Log("New snowring, dist " + validPositionDist +
-                            ", num samples tried " + numSamplesTried +
-                            " over " + (Time.time - timeStartedSampling) + "s");
+                //Debug.Log("New snowring, dist " + validPositionDist +
+                //            ", num samples tried " + numSamplesTried +
+                //            " over " + (Time.time - timeStartedSampling) + "s");
                 this.transform.position = validPosition;
 
                 // Rotate the ring to face the camera

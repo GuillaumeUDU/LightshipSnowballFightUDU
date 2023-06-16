@@ -70,6 +70,8 @@ namespace Niantic.ARVoyage
         private bool triggerPressed;
         private float consolePeakAcceleration;
         private float consoleCurrentAcceleration;
+        private float peakTime;
+        private float releasedTime;
 
         private AudioManager audioManager;
         private AbstractDataStream uduConsole;
@@ -99,11 +101,14 @@ namespace Niantic.ARVoyage
         {
             triggerPressed = true;
             consolePeakAcceleration = 0;
+            peakTime = 0;
+            releasedTime = 0;
         }
 
         private void TriggerButtonReleased()
         {
             triggerPressed = false;
+            //releasedTime = Time.time;
         }
 
         public void InitSnowball(string spawnerDescription, Transform newParent = null)
@@ -176,13 +181,18 @@ namespace Niantic.ARVoyage
 
         private void ConsolePickAcceleration()
         {
+            if (!triggerPressed) return;
+
             // Update the variable value
             consoleCurrentAcceleration = uduConsole.GetAcceleration().magnitude;
+
+            releasedTime = Time.time;
 
             if (triggerPressed && consoleCurrentAcceleration > consolePeakAcceleration)
             {
                 // Update the max value if the current value is higher
                 consolePeakAcceleration = consoleCurrentAcceleration;
+                peakTime = Time.time;
             }
         }
 
@@ -247,7 +257,15 @@ namespace Niantic.ARVoyage
             tossRotation.x -= tossAngle;
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
-            snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
+            if (releasedTime - peakTime > 1f)
+            {
+                snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
+            }
+            else
+            {
+                snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
+            }
+
             snowballRigidbody.AddTorque(this.transform.right * Random.Range(1, 3));
 
             // Set snowball lifetime duration
@@ -281,7 +299,7 @@ namespace Niantic.ARVoyage
 
         void OnCollisionEnter(Collision collision)
         {
-            Debug.Log("Snowball OnCollisionEnter for " + this);
+            //Debug.Log("Snowball OnCollisionEnter for " + this);
 
             // Filter out collisions if we've decided to burst already.
             if (hasBurst) return;
@@ -297,7 +315,7 @@ namespace Niantic.ARVoyage
         // Default collision handling logic
         public void HandleCollision(Collision collision, bool destroy = true)
         {
-            Debug.Log("Handle collision for " + this);
+            //Debug.Log("Handle collision for " + this);
 
             // If we hit anything other than environment layers,
             // then always destroy the snowball.
@@ -387,7 +405,7 @@ namespace Niantic.ARVoyage
 
             if (snowballBurstPrefab != null && !hasBurst)
             {
-                Debug.Log("Burst snowball " + this + " isHeld? " + IsHeld);
+                //Debug.Log("Burst snowball " + this + " isHeld? " + IsHeld);
 
                 GameObject snowballBurstInstance = Instantiate(snowballBurstPrefab,
                                                                 position,

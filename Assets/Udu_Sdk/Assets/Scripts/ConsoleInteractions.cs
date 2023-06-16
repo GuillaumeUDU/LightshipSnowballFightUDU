@@ -98,7 +98,7 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
         if (buttonClicked != null)
         {
             buttonClicked.onClick.Invoke();
-            Debug.Log("btn  name: " + buttonGO.transform.name);
+            //Debug.Log("btn  name: " + buttonGO.transform.name);
         }
     }
     private void InteractionWithButton(GameObject buttonGO)
@@ -111,6 +111,6 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
             entry.callback.Invoke(null);
         }
         //triggerClicked.triggers[0].callback.Invoke(null);
-        Debug.Log("btn  name: " + buttonGO.transform.name);
+        //Debug.Log("btn  name: " + buttonGO.transform.name);
     }
 }

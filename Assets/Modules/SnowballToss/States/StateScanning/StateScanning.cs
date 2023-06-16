@@ -70,7 +70,7 @@ namespace Niantic.ARVoyage.SnowballToss
         {
             thisState = this.gameObject;
             exitState = null;
-            Debug.Log("Starting " + thisState);
+            //Debug.Log("Starting " + thisState);
             timeStartedState = Time.time;
 
             // Fade in GUI
@@ -130,7 +130,7 @@ namespace Niantic.ARVoyage.SnowballToss
             // Fade out GUI
             yield return StartCoroutine(DemoUtil.FadeOutGUI(gui, fader));
 
-            Debug.Log(thisState + " transitioning to " + nextState);
+            //Debug.Log(thisState + " transitioning to " + nextState);
 
             nextState.SetActive(true);
             thisState.SetActive(false);
