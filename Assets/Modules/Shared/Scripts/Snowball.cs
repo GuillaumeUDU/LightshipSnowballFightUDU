@@ -247,7 +247,7 @@ namespace Niantic.ARVoyage
             tossRotation.x -= tossAngle;
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
-            snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
+            snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
             snowballRigidbody.AddTorque(this.transform.right * Random.Range(1, 3));
 
             // Set snowball lifetime duration
@@ -265,8 +265,8 @@ namespace Niantic.ARVoyage
         {
             float minValue = 900f;
             float maxValue = 5000f;
-            float minTargetValue = 15f;
-            float maxTargetValue = 35f;
+            float minTargetValue = 10f;
+            float maxTargetValue = 40f;
 
             // Calculate the percentage of the original value within the range
             float percentage = (value - minValue) / (maxValue - minValue);
@@ -274,7 +274,7 @@ namespace Niantic.ARVoyage
             // Map the percentage to the target range
             float targetValue = minTargetValue + (maxTargetValue - minTargetValue) * percentage;
 
-            Debug.Log("SNOWBALL SPEED:" + targetValue + " , CONSOLE MAGNITUDE:" + uduConsole.GetAcceleration().magnitude);
+            Debug.Log("SNOWBALL SPEED:" + targetValue);
 
             return targetValue;
         }

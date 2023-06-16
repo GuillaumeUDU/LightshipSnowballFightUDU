@@ -11,14 +11,15 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
     private void Start()
     {
         DontDestroyOnLoad(this);
-        EventsSystemHandler.Instance.onTriggerPressTriggerButton += InteractionWithTrigger;
+        //EventsSystemHandler.Instance.onTriggerPressTriggerButton += InteractionWithTrigger;
+        EventsSystemHandler.Instance.onTriggerReleaseTriggerButton += InteractionWithTriggerRelease;
         EventsSystemHandler.Instance.onTriggerPressSqueezeButton += InteractionWithSqueeze;
         EventsSystemHandler.Instance.onTriggerReleaseSqueezeButton += SqueezeReleased;
         EventsSystemHandler.Instance.onTriggerPressTrackpadButton += InteractionWithTrackpad;
         EventsSystemHandler.Instance.onTriggerReleaseTrackpadButton += TrackpadReleased;
     }
 
-    private void InteractionWithTrigger()
+    private void InteractionWithTriggerRelease()
     {
         // find a button??
         // check if correct button??
