@@ -255,6 +255,7 @@ namespace Niantic.ARVoyage
             // Toss snowball upward and forward with force
             Vector3 tossRotation = this.transform.eulerAngles;
             tossRotation.x -= tossAngle;
+            tossRotation.y -= tossAngle/3;
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
             if (releasedTime - peakTime > 1f)
@@ -266,7 +267,15 @@ namespace Niantic.ARVoyage
                 snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
             }
 
-            snowballRigidbody.AddTorque(this.transform.right * Random.Range(1, 3));
+            /////////////////////////////
+            //// -up : going left    ////
+            ////  up : going right   ////
+            ////  right : going down ////
+            //// -right : going up   ////
+            /////////////////////////////
+
+            //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.25f));
+            snowballRigidbody.AddTorque(this.transform.up * 0.2f);
 
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;

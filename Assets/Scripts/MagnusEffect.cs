@@ -5,9 +5,13 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class MagnusEffect : MonoBehaviour
 {
-    public float radius = .5f;
+    // 0.5 very high value huge angle
+    // 0.2 very low value barely noticable
+    // 0.275 good low value but light angle
+    // 0.333 good value but average angle
+    private float radius = .333f;
     //Real life value 1.2, base script value is 0.1
-    public float airDensity = .1f;
+    private float airDensity = .1f;
 
     private Rigidbody rb;
 
