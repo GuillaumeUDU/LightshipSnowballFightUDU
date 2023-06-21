@@ -175,14 +175,14 @@ public class BLEDataStream : AbstractDataStream
         if (triggerPressed && firstTriggerPress)
         {
             TriggerButtonPressed();
-            Debug.Log("Trigger");
+            //Debug.Log("Trigger");
             firstTriggerPress = false;
             triggerReleased = true;
         }
         if (!triggerPressed && triggerReleased)
         {
             TriggerButtonReleased();
-            Debug.Log("Trigger released");
+            //Debug.Log("Trigger released");
             triggerReleased = false;
         }
         if (!squeezePressed && squeezeReleased)

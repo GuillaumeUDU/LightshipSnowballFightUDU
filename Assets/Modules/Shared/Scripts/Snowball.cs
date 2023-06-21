@@ -72,6 +72,9 @@ namespace Niantic.ARVoyage
         private float consoleCurrentAcceleration;
         private float peakTime;
         private float releasedTime;
+        private float orientationOnPress;
+        private float orientationOnRelease;
+
 
         private AudioManager audioManager;
         private AbstractDataStream uduConsole;
@@ -94,7 +97,7 @@ namespace Niantic.ARVoyage
         private void Start()
         {
             EventsSystemHandler.Instance.onTriggerPressTriggerButton += TriggerButtonPressed;
-            EventsSystemHandler.Instance.onTriggerPressSqueezeButton += TriggerButtonReleased;
+            EventsSystemHandler.Instance.onTriggerReleaseTriggerButton += TriggerButtonReleased;
         }
 
         private void TriggerButtonPressed()
@@ -103,12 +106,15 @@ namespace Niantic.ARVoyage
             consolePeakAcceleration = 0;
             peakTime = 0;
             releasedTime = 0;
+            orientationOnPress = uduConsole.GetMagneticHeading();
+            //Debug.Log("HEADING ON PRESS: " + uduConsole.GetMagneticHeading());
+
         }
 
         private void TriggerButtonReleased()
         {
             triggerPressed = false;
-            //releasedTime = Time.time;
+            //Debug.Log("HEADING ON RELEASE: " + uduConsole.GetMagneticHeading());
         }
 
         public void InitSnowball(string spawnerDescription, Transform newParent = null)
@@ -177,6 +183,7 @@ namespace Niantic.ARVoyage
             }
 
             ConsolePickAcceleration();
+            Debug.Log("X:" + uduConsole.GetOrientation().eulerAngles.x);
         }
 
         private void ConsolePickAcceleration()
@@ -246,7 +253,11 @@ namespace Niantic.ARVoyage
 
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
+            orientationOnRelease = uduConsole.GetMagneticHeading();
+
+            float angleDelta = CalculateAngleDelta(orientationOnPress, orientationOnRelease);
             timeTossed = Time.time;
+
 
             // Activate gravity/physics on snowball
             snowballRigidbody.isKinematic = false;
@@ -255,17 +266,20 @@ namespace Niantic.ARVoyage
             // Toss snowball upward and forward with force
             Vector3 tossRotation = this.transform.eulerAngles;
             tossRotation.x -= tossAngle;
-            tossRotation.y -= tossAngle/3;
+
+            if (angleDelta >= 120) angleDelta = 120;
+            else if (angleDelta <= -120) angleDelta = -120;
+
+            if (angleDelta > 0) tossRotation.y -= angleDelta / 12;
+            else if (angleDelta <= 0) tossRotation.y += angleDelta / 12;
+
+            // 10 feels like a good angle paired with a radius of 0.333 of the magnus effect
+            //tossRotation.y -= 10;
+
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
-            if (releasedTime - peakTime > 1f)
-            {
-                snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
-            }
-            else
-            {
-                snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
-            }
+            if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
+            else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
             /////////////////////////////
             //// -up : going left    ////
@@ -274,9 +288,11 @@ namespace Niantic.ARVoyage
             //// -right : going up   ////
             /////////////////////////////
 
-            //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.25f));
-            snowballRigidbody.AddTorque(this.transform.up * 0.2f);
-
+            //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.2f));
+            float convertedAngleValue = (angleDelta / 120f) * 0.2f;
+            if (angleDelta > 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
+            else if (angleDelta <= 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
+            Debug.Log("ANGLE: " + angleDelta);
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;
 
@@ -288,6 +304,13 @@ namespace Niantic.ARVoyage
             // since snowball may burst before throw SFX is done
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
         }
+
+        float CalculateAngleDelta(float pressAngle, float releaseAngle)
+        {
+            float angleDelta = Mathf.DeltaAngle(pressAngle, releaseAngle);
+            return angleDelta;
+        }
+
         float ConvertValue(float value)
         {
             float minValue = 900f;
