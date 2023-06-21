@@ -106,7 +106,7 @@ namespace Niantic.ARVoyage
             consolePeakAcceleration = 0;
             peakTime = 0;
             releasedTime = 0;
-            orientationOnPress = uduConsole.GetMagneticHeading();
+            orientationOnPress = uduConsole.GetOrientation().eulerAngles.x;
             //Debug.Log("HEADING ON PRESS: " + uduConsole.GetMagneticHeading());
 
         }
@@ -183,7 +183,7 @@ namespace Niantic.ARVoyage
             }
 
             ConsolePickAcceleration();
-            Debug.Log("X:" + uduConsole.GetOrientation().eulerAngles.x);
+            Debug.Log("X: " + uduConsole.GetOrientation().eulerAngles.x);
         }
 
         private void ConsolePickAcceleration()
@@ -253,7 +253,7 @@ namespace Niantic.ARVoyage
 
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
-            orientationOnRelease = uduConsole.GetMagneticHeading();
+            orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
 
             float angleDelta = CalculateAngleDelta(orientationOnPress, orientationOnRelease);
             timeTossed = Time.time;
@@ -267,14 +267,14 @@ namespace Niantic.ARVoyage
             Vector3 tossRotation = this.transform.eulerAngles;
             tossRotation.x -= tossAngle;
 
-            if (angleDelta >= 120) angleDelta = 120;
-            else if (angleDelta <= -120) angleDelta = -120;
+            //if (angleDelta >= 120) angleDelta = 120;
+            //else if (angleDelta <= -120) angleDelta = -120;
 
-            if (angleDelta > 0) tossRotation.y -= angleDelta / 12;
-            else if (angleDelta <= 0) tossRotation.y += angleDelta / 12;
+            if (orientationOnRelease >= 0 && orientationOnRelease < 180) tossRotation.y -= 10;
+            else tossRotation.y += 10;
 
-            // 10 feels like a good angle paired with a radius of 0.333 of the magnus effect
-            //tossRotation.y -= 10;
+            //if (angleDelta > 0) tossRotation.y -= angleDelta / 12;
+            //else if (angleDelta <= 0) tossRotation.y += angleDelta / 12;
 
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
@@ -289,10 +289,15 @@ namespace Niantic.ARVoyage
             /////////////////////////////
 
             //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.2f));
-            float convertedAngleValue = (angleDelta / 120f) * 0.2f;
+            float convertedAngleValue;
+
+            if (orientationOnRelease >= 0 && orientationOnRelease < 180) convertedAngleValue = -.2f;
+            else convertedAngleValue = .2f;
+
+
             if (angleDelta > 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
             else if (angleDelta <= 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
-            Debug.Log("ANGLE: " + angleDelta);
+
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;
 
