@@ -270,8 +270,8 @@ namespace Niantic.ARVoyage
             //if (angleDelta >= 120) angleDelta = 120;
             //else if (angleDelta <= -120) angleDelta = -120;
 
-            if (orientationOnRelease >= 0 && orientationOnRelease < 180) tossRotation.y -= 10;
-            else tossRotation.y += 10;
+            //if (orientationOnRelease >= 0 && orientationOnRelease < 180) tossRotation.y -= 10 * Random.Range(0.8f, 1.2f);
+            //else tossRotation.y += 10 * Random.Range(0.8f, 1.2f);
 
             //if (angleDelta > 0) tossRotation.y -= angleDelta / 12;
             //else if (angleDelta <= 0) tossRotation.y += angleDelta / 12;
@@ -281,22 +281,33 @@ namespace Niantic.ARVoyage
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
-            /////////////////////////////
-            //// -up : going left    ////
-            ////  up : going right   ////
-            ////  right : going down ////
-            //// -right : going up   ////
-            /////////////////////////////
+            ///////////////////////////
+            /// -up : going left    ///
+            ///  up : going right   ///
+            ///  right : going down ///
+            /// -right : going up   ///
+            ///////////////////////////
 
             //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.2f));
             float convertedAngleValue;
 
-            if (orientationOnRelease >= 0 && orientationOnRelease < 180) convertedAngleValue = -.2f;
-            else convertedAngleValue = .2f;
+            //if (orientationOnRelease >= 0 && orientationOnRelease < 180) convertedAngleValue = -.2f;
+            //else convertedAngleValue = .2f;
 
+            if (orientationOnRelease >= 20 && orientationOnRelease <= 180)
+            {
+                convertedAngleValue = -1 * ConvertValueOrientationX(orientationOnRelease, 20, 170);
+            }
+            else if (orientationOnRelease <= 340 && orientationOnRelease > 180)
+            {
+                convertedAngleValue = ConvertValueOrientationX(orientationOnRelease, 340, 190);
+            }
+            else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
+            {
+                convertedAngleValue = 0f;
+            }
 
-            if (angleDelta > 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
-            else if (angleDelta <= 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
+            snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
 
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;
@@ -308,6 +319,18 @@ namespace Niantic.ARVoyage
             // Use PlayAudioAtPosition instead of PlayAudioOnObject, 
             // since snowball may burst before throw SFX is done
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
+        }
+
+        float ConvertValueOrientationX(float value, float rangeMin, float rangeMax)
+        {
+            //float rangeMin = 20f;
+            //float rangeMax = 60f;
+            float targetMin = 0.5f;
+            float targetMax = 0.2f;
+            value = Mathf.Clamp(value, rangeMin, rangeMax);
+            float convertedValue = targetMin + (value - rangeMin) * (targetMax - targetMin) / (rangeMax - rangeMin);
+
+            return convertedValue;
         }
 
         float CalculateAngleDelta(float pressAngle, float releaseAngle)
@@ -328,8 +351,6 @@ namespace Niantic.ARVoyage
 
             // Map the percentage to the target range
             float targetValue = minTargetValue + (maxTargetValue - minTargetValue) * percentage;
-
-            Debug.Log("SNOWBALL SPEED:" + targetValue);
 
             return targetValue;
         }
