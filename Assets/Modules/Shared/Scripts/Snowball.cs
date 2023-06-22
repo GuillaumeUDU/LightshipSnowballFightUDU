@@ -72,7 +72,6 @@ namespace Niantic.ARVoyage
         private float consoleCurrentAcceleration;
         private float peakTime;
         private float releasedTime;
-        private float orientationOnPress;
         private float orientationOnRelease;
 
 
@@ -106,15 +105,11 @@ namespace Niantic.ARVoyage
             consolePeakAcceleration = 0;
             peakTime = 0;
             releasedTime = 0;
-            orientationOnPress = uduConsole.GetOrientation().eulerAngles.x;
-            //Debug.Log("HEADING ON PRESS: " + uduConsole.GetMagneticHeading());
-
         }
 
         private void TriggerButtonReleased()
         {
             triggerPressed = false;
-            //Debug.Log("HEADING ON RELEASE: " + uduConsole.GetMagneticHeading());
         }
 
         public void InitSnowball(string spawnerDescription, Transform newParent = null)
@@ -255,9 +250,7 @@ namespace Niantic.ARVoyage
         {
             orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
 
-            float angleDelta = CalculateAngleDelta(orientationOnPress, orientationOnRelease);
             timeTossed = Time.time;
-
 
             // Activate gravity/physics on snowball
             snowballRigidbody.isKinematic = false;
@@ -288,19 +281,18 @@ namespace Niantic.ARVoyage
             /// -right : going up   ///
             ///////////////////////////
 
-            //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.2f));
             float convertedAngleValue;
 
             //if (orientationOnRelease >= 0 && orientationOnRelease < 180) convertedAngleValue = -.2f;
             //else convertedAngleValue = .2f;
 
-            if (orientationOnRelease >= 20 && orientationOnRelease <= 180)
+            if (orientationOnRelease >= 1 && orientationOnRelease <= 180)
             {
-                convertedAngleValue = -1 * ConvertValueOrientationX(orientationOnRelease, 20, 170);
+                convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 1, 170);
             }
-            else if (orientationOnRelease <= 340 && orientationOnRelease > 180)
+            else if (orientationOnRelease <= 359 && orientationOnRelease > 180)
             {
-                convertedAngleValue = ConvertValueOrientationX(orientationOnRelease, 340, 190);
+                convertedAngleValue = ConvertValueOrientation359To190(orientationOnRelease, 190, 359);
             }
             else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
             {
@@ -321,14 +313,29 @@ namespace Niantic.ARVoyage
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
         }
 
-        float ConvertValueOrientationX(float value, float rangeMin, float rangeMax)
+        float ConvertValueOrientation0To170(float value, float rangeMin, float rangeMax)
         {
-            //float rangeMin = 20f;
-            //float rangeMax = 60f;
-            float targetMin = 0.5f;
+            float targetMin = 0f;
             float targetMax = 0.2f;
             value = Mathf.Clamp(value, rangeMin, rangeMax);
             float convertedValue = targetMin + (value - rangeMin) * (targetMax - targetMin) / (rangeMax - rangeMin);
+
+            return convertedValue;
+        }
+
+        float ConvertValueOrientation359To190(float originalValue, float minValue, float maxValue)
+        {
+            float minTargetValue = 0.2f;
+            float maxTargetValue = 0f;
+
+            // Clamp the original value between the minimum and maximum values
+            float clampedValue = Mathf.Clamp(originalValue, minValue, maxValue);
+
+            // Calculate the normalized value between 0 and 1
+            float normalizedValue = (clampedValue - minValue) / (maxValue - minValue);
+
+            // Map the normalized value to the target range
+            float convertedValue = Mathf.Lerp(minTargetValue, maxTargetValue, normalizedValue);
 
             return convertedValue;
         }
@@ -343,8 +350,8 @@ namespace Niantic.ARVoyage
         {
             float minValue = 900f;
             float maxValue = 5000f;
-            float minTargetValue = 10f;
-            float maxTargetValue = 40f;
+            float minTargetValue = 20f;
+            float maxTargetValue = 30f;
 
             // Calculate the percentage of the original value within the range
             float percentage = (value - minValue) / (maxValue - minValue);
