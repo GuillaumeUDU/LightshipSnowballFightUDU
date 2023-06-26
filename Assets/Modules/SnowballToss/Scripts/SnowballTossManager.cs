@@ -32,12 +32,15 @@ namespace Niantic.ARVoyage.SnowballToss
         [Header("GUI")]
         [SerializeField] private GameTimeAndScore gameTimeAndScoreGUI;
         public int gameScore { get; private set; } = 0;
+        //public int gameHighScore { get; private set; } = 0;
+        private static int highScore;
 
         public List<Snowring> snowrings { get; private set; } = new List<Snowring>();
         private Snowring newSnowringSearchingForPlacement;
         private int snowringCtr = 0;
         private float nextSnowringStartTime = 0f;
         public int lastDestroyedSnowringSector { get; private set; } = -1;
+        public int HighScore { get => highScore; set => highScore = value; }
 
         private const float secsTillFirstSnowring = 0f;
         private const float secsTillNextSnowring = 2.5f;
@@ -54,6 +57,11 @@ namespace Niantic.ARVoyage.SnowballToss
             snowballMaker.tossAngle = SnowballMaker.defaultTossAngle + snowballTossAngleDegOffset;
         }
 
+        private void Start()
+        {
+            // Load the existing high score from PlayerPrefs
+            highScore = PlayerPrefs.GetInt("HighScore", 0);
+        }
 
         public void InitTossGame()
         {
@@ -109,7 +117,6 @@ namespace Niantic.ARVoyage.SnowballToss
         public void SnowRingSucceeded()
         {
             gameScore += scoreIncrementPerRing;
-
             gameTimeAndScoreGUI.IncrementScore(scoreIncrementPerRing);
         }
 
@@ -153,6 +160,23 @@ namespace Niantic.ARVoyage.SnowballToss
             {
                 Destroy(splat.gameObject);
             }
+        }
+
+        public static void SaveHighScore(int score)
+        {
+            // Update the high score if the new score is higher
+            if (score > highScore)
+            {
+                highScore = score;
+                PlayerPrefs.SetInt("HighScore", highScore);
+            }
+        }
+
+        public static void ResetHighScore()
+        {
+            // Reset the high score to 0
+            highScore = 0;
+            PlayerPrefs.SetInt("HighScore", highScore);
         }
     }
 }

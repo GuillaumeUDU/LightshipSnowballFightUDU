@@ -274,23 +274,23 @@ namespace Niantic.ARVoyage
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
-            ///////////////////////////
-            /// -up : going left    ///
-            ///  up : going right   ///
-            ///  right : going down ///
-            /// -right : going up   ///
-            ///////////////////////////
+            /////////////////////////
+            // -up : going left    //
+            //  up : going right   //
+            //  right : going down //
+            // -right : going up   //
+            /////////////////////////
 
             float convertedAngleValue;
 
             //if (orientationOnRelease >= 0 && orientationOnRelease < 180) convertedAngleValue = -.2f;
             //else convertedAngleValue = .2f;
 
-            if (orientationOnRelease >= 1 && orientationOnRelease <= 180)
+            if (orientationOnRelease >= 0 && orientationOnRelease <= 180)
             {
                 convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 1, 170);
             }
-            else if (orientationOnRelease <= 359 && orientationOnRelease > 180)
+            else if (orientationOnRelease <= 360 && orientationOnRelease > 180)
             {
                 convertedAngleValue = ConvertValueOrientation359To190(orientationOnRelease, 190, 359);
             }
@@ -465,6 +465,9 @@ namespace Niantic.ARVoyage
 
         public void Burst(Vector3 position, Vector3 normal, bool showSecondaryParticles = false)
         {
+            //Console outputs
+            if (uduConsole != null) uduConsole.SetVibrationAndStart("/spiffs/bd1_01.wav", false);
+
             // Always hide the VFX
             ShowVFX(false);
 
@@ -486,6 +489,8 @@ namespace Niantic.ARVoyage
 
                 // SFX
                 audioManager.PlayAudioAtPosition(AudioKeys.SFX_Snowball_Bump, position);
+
+
             }
         }
 

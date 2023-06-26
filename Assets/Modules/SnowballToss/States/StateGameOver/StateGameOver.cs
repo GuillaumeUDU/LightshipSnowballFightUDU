@@ -35,6 +35,7 @@ namespace Niantic.ARVoyage.SnowballToss
         [SerializeField] private GameObject yetiLoseImage;
         [SerializeField] private TMPro.TMP_Text titleText;
         [SerializeField] private TMPro.TMP_Text scoreText;
+        [SerializeField] private TMPro.TMP_Text highscoreText;
         private Fader fader;
 
 
@@ -65,11 +66,15 @@ namespace Niantic.ARVoyage.SnowballToss
             // Subscribe to events
             SnowballTossEvents.EventRestartButton.AddListener(OnEventRestartButton);
 
+            // Save highScore
+            SnowballTossManager.SaveHighScore(snowballTossManager.gameScore);
+
             // Set GUI image and text
             yetiVictoryImage.gameObject.SetActive(victory);
             yetiLoseImage.gameObject.SetActive(!victory);
             titleText.text = victory ? victoryTextStr : tryAgainTextStr;
             scoreText.text = snowballTossManager.gameScore.ToString();
+            highscoreText.text = snowballTossManager.HighScore.ToString();
 
             // SFX
             audioManager.PlayAudioNonSpatial(AudioKeys.SFX_Winner_Fanfare);

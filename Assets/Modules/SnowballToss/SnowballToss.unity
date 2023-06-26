@@ -2058,6 +2058,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5080332003338928521, guid: e88761112df094524adfd544301c2a69,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5561614647618044759, guid: e88761112df094524adfd544301c2a69,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -2172,6 +2177,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -25
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181868770581455910, guid: e88761112df094524adfd544301c2a69,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e88761112df094524adfd544301c2a69, type: 3}
@@ -2511,6 +2521,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 960877308}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &987182780 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2747912677334515842, guid: 0f48e2e3211774908b4e6fd5a26a54eb,
+    type: 3}
+  m_PrefabInstance: {fileID: 1857798472}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1164379316 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7315055104982771470, guid: e91d6d15f11cc4ad29bb1a41ae9aa381,
@@ -2676,6 +2698,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1247152093}
   - component: {fileID: 1247152092}
+  - component: {fileID: 1247152094}
   m_Layer: 0
   m_Name: SnowballTossManager
   m_TagString: Untagged
@@ -2715,6 +2738,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1247152094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247152091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5a32bc0587a00646825698176a64693, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1262632246
 GameObject:
   m_ObjectHideFlags: 0
@@ -3043,6 +3078,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Console_Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5658876107621723418, guid: 1716a4665600cb64bb6d58919b0bc648,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1716a4665600cb64bb6d58919b0bc648, type: 3}
@@ -3823,6 +3863,11 @@ PrefabInstance:
       propertyPath: nextState
       value: 
       objectReference: {fileID: 1987706718}
+    - target: {fileID: 1742162132005631660, guid: 0f48e2e3211774908b4e6fd5a26a54eb,
+        type: 3}
+      propertyPath: highscoreText
+      value: 
+      objectReference: {fileID: 987182780}
     - target: {fileID: 1804003377113823480, guid: 0f48e2e3211774908b4e6fd5a26a54eb,
         type: 3}
       propertyPath: m_IsActive
