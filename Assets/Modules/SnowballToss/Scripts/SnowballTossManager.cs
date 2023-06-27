@@ -14,8 +14,8 @@ namespace Niantic.ARVoyage.SnowballToss
     {
         public const int minVictoryPoints = scoreIncrementPerRing * 4;
         private const int scoreIncrementPerRing = 100;
-        public int gameDuration = 45;
-        public int nearGameEndDuration = 5;
+        public static int gameDuration = 45;
+        public const int nearGameEndDuration = 5;
         private int maxNumSnowrings = 3;
 
         // gets added to SnowballMaker.defaultTossAngle
