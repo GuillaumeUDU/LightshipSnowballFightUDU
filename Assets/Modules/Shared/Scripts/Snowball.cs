@@ -466,7 +466,7 @@ namespace Niantic.ARVoyage
         public void Burst(Vector3 position, Vector3 normal, bool showSecondaryParticles = false)
         {
             //Console outputs
-            if (uduConsole != null) uduConsole.SetVibrationAndStart("/spiffs/bd1_01.wav", false);
+            //if (uduConsole != null) uduConsole.SetVibrationAndStart("/spiffs/bd1_01.wav", false);
 
             // Always hide the VFX
             ShowVFX(false);
