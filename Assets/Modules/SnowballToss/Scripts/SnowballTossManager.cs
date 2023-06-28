@@ -121,8 +121,8 @@ namespace Niantic.ARVoyage.SnowballToss
             gameTimeAndScoreGUI.IncrementScore(scoreIncrementPerRing);
 
             gameScoreLevel = gameScore / 100;
-            gameDuration += 5;
-            GameDifficulty(gameScoreLevel);
+            gameTimeAndScoreGUI.gameDuration += 5;
+            //GameDifficulty(gameScoreLevel);
             EventsSystemHandler.Instance.TriggerGettingPoints();
         }
 

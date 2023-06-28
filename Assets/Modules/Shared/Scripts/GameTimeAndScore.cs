@@ -164,6 +164,11 @@ namespace Niantic.ARVoyage
             scoreIncrement.gameObject.transform.localPosition = startPos;
         }
 
+        public void ExtraGameTime()
+        {
+            gameDuration += 5;
+        }
+
     }
 
 }

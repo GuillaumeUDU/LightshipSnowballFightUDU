@@ -620,6 +620,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RingArtPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 4235240152287249738, guid: 1d48d0a368377451eb90c2de4a5e4928,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7069767599704722535, guid: 1d48d0a368377451eb90c2de4a5e4928,
         type: 3}
       propertyPath: m_RootOrder

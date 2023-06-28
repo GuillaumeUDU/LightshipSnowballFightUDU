@@ -32,6 +32,12 @@ namespace Niantic.ARVoyage.SnowballToss
         private float maxXAxisAngle = 15f;
         private const float maxScale = 0.5f;
 
+        // Value for moving the rings
+        private float upAndDown;
+        private float leftAndRight;
+        private float speed;
+        private int ringMove;
+
         private int currentSector = 0;
 
         private const int numPlacementSectors = 360 / 30;
@@ -44,6 +50,7 @@ namespace Niantic.ARVoyage.SnowballToss
         private const int tooManySamplesTried = 300;
         private const float secsTillRecheckForNewlyFoundMesh = 0.5f;
         private float recheckMeshOverlapTime = 0f;
+        private Vector3 initialPosition;
 
         private const float spacingRadius = 0.4f;
         private const float samplingDistIncrement = spacingRadius / 2f;
@@ -98,6 +105,23 @@ namespace Niantic.ARVoyage.SnowballToss
 
             audioManager = SceneLookup.Get<AudioManager>();
         }
+        private void Start()
+        {
+            initialPosition = this.transform.position;
+            ringMove = Random.Range(0, 2);
+            if (ringMove == 1)
+            {
+                upAndDown = Random.Range(-.3f, .3f);
+                leftAndRight = 0;
+            }
+            if (ringMove == 0)
+            {
+                leftAndRight = Random.Range(-.3f, .3f);
+                upAndDown = 0;
+            }
+            
+            speed = Random.Range(.5f, 1f);
+        }
 
 
         // Possibly called multiple times, no more than once per frame, 
@@ -149,17 +173,22 @@ namespace Niantic.ARVoyage.SnowballToss
             if (!isPlaced) return;
 
             // Time to check for overlap with newly found mesh?
-            if (!isSuccess && !isExpiring && Time.time > recheckMeshOverlapTime)
+            if (!isSuccess && !isExpiring)
             {
-                recheckMeshOverlapTime = Time.time + secsTillRecheckForNewlyFoundMesh;
-
-                string collisionName;
-                int numOverlappingColliders = GetNumOverlappingColliders(spacingRadius, out collisionName);
-                if (numOverlappingColliders > 0)
+                if (Time.time > recheckMeshOverlapTime)
                 {
-                    Debug.Log("Snowring recheck collision with " + collisionName + "; expiring, age " + (Time.time - startTime) + "s");
-                    Expire();
+                    recheckMeshOverlapTime = Time.time + secsTillRecheckForNewlyFoundMesh;
+
+                    string collisionName;
+                    int numOverlappingColliders = GetNumOverlappingColliders(spacingRadius, out collisionName);
+                    if (numOverlappingColliders > 0)
+                    {
+                        Debug.Log("Snowring recheck collision with " + collisionName + "; expiring, age " + (Time.time - startTime) + "s");
+                        Expire();
+                    }
                 }
+
+                SnowRingBehaviorOnScore(snowballTossManager.gameScoreLevel);
             }
 
             // Time to autonomously end this ring?
@@ -463,6 +492,58 @@ namespace Niantic.ARVoyage.SnowballToss
 
             // Destroy is called at end of routine.
             StartCoroutine(SuccessRoutine(successDuration, successDelay));
+        }
+
+        public void SnowRingBehaviorOnScore(int score)
+        {
+            switch (score)
+            {
+                case int n when n >= 4 && n <= 8:
+                    MoveLeftAndRight();
+                    break;
+
+                case int n when n >= 9 && n <= 13:
+                    MoveUpAndDown();
+                    MoveLeftAndRight();
+                    break;
+
+                case int n when n >= 14 && n <= 18:
+                    RotateSnowring();
+                    MoveUpAndDown();
+                    MoveLeftAndRight();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        public void RotateSnowring()
+        {
+            Debug.Log("Rotate");
+
+            this.transform.Rotate(Vector3.up, 50f * Time.deltaTime);
+        }
+
+        private void MoveUpAndDown()
+        {
+            // Calculate the new position using a sine wave
+            float newY = initialPosition.y + Mathf.Sin(Time.time * speed) * upAndDown;
+            Vector3 newPosition = new Vector3(transform.position.x, newY, transform.position.z);
+
+            // Move the GameObject to the new position
+            transform.position = newPosition;
+        }
+
+
+        private void MoveLeftAndRight()
+        {
+            // Calculate the new position using a sine wave
+            float newX = initialPosition.x + Mathf.Sin(Time.time * speed) * leftAndRight;
+            Vector3 newPosition = new Vector3(newX, transform.position.y, transform.position.z);
+
+            // Move the GameObject to the new position
+            transform.position = newPosition;
         }
 
 

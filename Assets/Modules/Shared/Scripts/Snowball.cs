@@ -178,7 +178,7 @@ namespace Niantic.ARVoyage
             }
 
             ConsolePickAcceleration();
-            Debug.Log("X: " + uduConsole.GetOrientation().eulerAngles.x);
+            //Debug.Log("X: " + uduConsole.GetOrientation().eulerAngles.x);
         }
 
         private void ConsolePickAcceleration()
@@ -350,7 +350,7 @@ namespace Niantic.ARVoyage
         {
             float minValue = 900f;
             float maxValue = 5000f;
-            float minTargetValue = 20f;
+            float minTargetValue = 5f;
             float maxTargetValue = 30f;
 
             // Calculate the percentage of the original value within the range
