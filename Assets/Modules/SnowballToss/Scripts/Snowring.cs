@@ -111,16 +111,16 @@ namespace Niantic.ARVoyage.SnowballToss
             ringMove = Random.Range(0, 2);
             if (ringMove == 1)
             {
-                upAndDown = Random.Range(-.3f, .3f);
+                upAndDown = Random.Range(-.2f, .2f);
                 leftAndRight = 0;
             }
             if (ringMove == 0)
             {
-                leftAndRight = Random.Range(-.3f, .3f);
+                leftAndRight = Random.Range(-.2f, .2f);
                 upAndDown = 0;
             }
             
-            speed = Random.Range(.5f, 1f);
+            speed = Random.Range(.35f, .75f);
         }
 
 
@@ -499,18 +499,18 @@ namespace Niantic.ARVoyage.SnowballToss
             switch (score)
             {
                 case int n when n >= 4 && n <= 8:
-                    MoveLeftAndRight();
+                    MoveLeftAndRight(speed);
                     break;
 
                 case int n when n >= 9 && n <= 13:
-                    MoveUpAndDown();
-                    MoveLeftAndRight();
+                    MoveUpAndDown(speed*1.5f);
+                    MoveLeftAndRight(speed * 1.5f);
                     break;
 
-                case int n when n >= 14 && n <= 18:
-                    RotateSnowring();
-                    MoveUpAndDown();
-                    MoveLeftAndRight();
+                case int n when n >= 14 /*&& n <= 18*/:
+                    RotateSnowring(50f);
+                    MoveUpAndDown(speed * 2f);
+                    MoveLeftAndRight(speed * 2f);
                     break;
 
                 default:
@@ -518,14 +518,14 @@ namespace Niantic.ARVoyage.SnowballToss
             }
         }
 
-        public void RotateSnowring()
+        public void RotateSnowring(float rotateSpeed)
         {
             Debug.Log("Rotate");
 
-            this.transform.Rotate(Vector3.up, 50f * Time.deltaTime);
+            this.transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
         }
 
-        private void MoveUpAndDown()
+        private void MoveUpAndDown(float speed)
         {
             // Calculate the new position using a sine wave
             float newY = initialPosition.y + Mathf.Sin(Time.time * speed) * upAndDown;
@@ -536,7 +536,7 @@ namespace Niantic.ARVoyage.SnowballToss
         }
 
 
-        private void MoveLeftAndRight()
+        private void MoveLeftAndRight(float speed)
         {
             // Calculate the new position using a sine wave
             float newX = initialPosition.x + Mathf.Sin(Time.time * speed) * leftAndRight;
