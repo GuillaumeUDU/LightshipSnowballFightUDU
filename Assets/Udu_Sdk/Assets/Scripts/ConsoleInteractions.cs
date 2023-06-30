@@ -120,6 +120,7 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
     void LightAndDisplayFlash()
     {
         ConsoleIntegration.Instance.uduConsoleDatastream.SetImageVibrationAndLED("/spiffs/wint.gif", "/spiffs/bd1_01.wav", Color.green);
+        // We display the base image and color again after 2 seconds
         Invoke("BackToOriginalLightAndDisplay", 2f);
     }
 

@@ -18,6 +18,9 @@ namespace Niantic.ARVoyage.SnowballToss
         public const int nearGameEndDuration = 5;
         private int maxNumSnowrings = 3;
 
+        // Turning on and off timer and difficulty
+        public bool debugMode = false;
+
         // gets added to SnowballMaker.defaultTossAngle
         private const float snowballTossAngleDegOffset = 10f;
 
@@ -62,6 +65,7 @@ namespace Niantic.ARVoyage.SnowballToss
         {
             // Load the existing high score from PlayerPrefs
             highScore = PlayerPrefs.GetInt("HighScore", 0);
+            debugMode = false;
         }
 
         public void InitTossGame()
@@ -122,7 +126,7 @@ namespace Niantic.ARVoyage.SnowballToss
 
             gameScoreLevel = gameScore / 100;
             gameTimeAndScoreGUI.gameDuration += 5;
-            //GameDifficulty(gameScoreLevel);
+            
             EventsSystemHandler.Instance.TriggerGettingPoints();
         }
 
@@ -185,6 +189,22 @@ namespace Niantic.ARVoyage.SnowballToss
             PlayerPrefs.SetInt("HighScore", highScore);
         }
 
+        public void ToggleOnOffDebugMode()
+        {
+            if (debugMode)
+            {
+                debugMode = false;
+                gameTimeAndScoreGUI.debugMode = false;
+            }
+            else
+            {
+                debugMode = true;
+                gameTimeAndScoreGUI.debugMode = true;
+            }
+        }
+
+
+        // Additionnal diffuctly settings for spawn speed and max of snowring, not used cause make game too difficult
         void GameDifficulty(int scoreLevel)
         {
             switch (scoreLevel)
@@ -205,8 +225,6 @@ namespace Niantic.ARVoyage.SnowballToss
                     break;
 
                 default:
-                    Debug.Log("Invalid option.");
-                    // Perform actions for invalid option
                     break;
             }
         }

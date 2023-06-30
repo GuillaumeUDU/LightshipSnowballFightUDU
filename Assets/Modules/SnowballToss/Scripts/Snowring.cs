@@ -35,7 +35,8 @@ namespace Niantic.ARVoyage.SnowballToss
         // Value for moving the rings
         private float upAndDown;
         private float leftAndRight;
-        private float speed;
+        private float speed = 2f;
+        private float rotatingSpeed = 35f;
         private int ringMove;
 
         private int currentSector = 0;
@@ -61,6 +62,9 @@ namespace Niantic.ARVoyage.SnowballToss
         private bool isPlaced = false;
         private bool isSuccess = false;
         private bool isExpiring = false;
+        private bool initialPositionInit = false;
+
+        private float direction = 1f;
 
         private AudioManager audioManager;
 
@@ -107,21 +111,39 @@ namespace Niantic.ARVoyage.SnowballToss
         }
         private void Start()
         {
+            if (!snowballTossManager.debugMode)
+            {
+                ManagingDifficutlySpeedAndDistanceOfRings();
+                initialPositionInit = false;
+            }
+        }
+        void ManagingDifficutlySpeedAndDistanceOfRings()
+        {
             initialPosition = this.transform.position;
+
+            // Picking if the ring is gonna move up and down OR left and right
             ringMove = Random.Range(0, 2);
+
+            // If 1 = ring move up and down
             if (ringMove == 1)
             {
+                // Travel distance of the ring
                 upAndDown = Random.Range(-.2f, .2f);
                 leftAndRight = 0;
             }
+
+            // If 0 = ring left and right
             if (ringMove == 0)
             {
-                leftAndRight = Random.Range(-.2f, .2f);
                 upAndDown = 0;
+                // Travel distance of the ring
+                leftAndRight = Random.Range(-.2f, .2f);
             }
-            
-            speed = Random.Range(.35f, .75f);
+
+            //// range of speed the ring is moving
+            //speed = Random.Range(.15f, .35f);
         }
+
 
 
         // Possibly called multiple times, no more than once per frame, 
@@ -496,21 +518,26 @@ namespace Niantic.ARVoyage.SnowballToss
 
         public void SnowRingBehaviorOnScore(int score)
         {
+            // If we enabled debug mode, snowring stop moving/rotating
+            if (snowballTossManager.debugMode) return;
+
             switch (score)
             {
+                // If score is between 400 and 800 we can only move left to right
                 case int n when n >= 4 && n <= 8:
-                    MoveLeftAndRight(speed);
+                    Move(1);
                     break;
 
+                // If score is between 900 and 1300 we can move up and down OR left to right
                 case int n when n >= 9 && n <= 13:
-                    MoveUpAndDown(speed*1.5f);
-                    MoveLeftAndRight(speed * 1.5f);
+                    Move(1.2f);
                     break;
 
-                case int n when n >= 14 /*&& n <= 18*/:
-                    RotateSnowring(50f);
-                    MoveUpAndDown(speed * 2f);
-                    MoveLeftAndRight(speed * 2f);
+                // If score is higher than 1400 the rings can also rotate
+                case int n when n >= 14:
+                    // Rotating ring at given speed
+                    RotateSnowring(rotatingSpeed);
+                    Move(1.5f);
                     break;
 
                 default:
@@ -520,32 +547,33 @@ namespace Niantic.ARVoyage.SnowballToss
 
         public void RotateSnowring(float rotateSpeed)
         {
-            Debug.Log("Rotate");
-
             this.transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
         }
+        void Move(float speedMutliplier)
+        {
+            if (ringMove==1) MoveUpAndDown(speedMutliplier);
+            else MoveLeftAndRight(speedMutliplier);
+        }
 
-        private void MoveUpAndDown(float speed)
+        private void MoveUpAndDown(float speedMutliplier)
         {
             // Calculate the new position using a sine wave
-            float newY = initialPosition.y + Mathf.Sin(Time.time * speed) * upAndDown;
+            float newY = initialPosition.y + Mathf.Sin(Time.time * speed * speedMutliplier) * upAndDown;
             Vector3 newPosition = new Vector3(transform.position.x, newY, transform.position.z);
 
             // Move the GameObject to the new position
             transform.position = newPosition;
         }
 
-
-        private void MoveLeftAndRight(float speed)
+        private void MoveLeftAndRight(float speedMutliplier)
         {
             // Calculate the new position using a sine wave
-            float newX = initialPosition.x + Mathf.Sin(Time.time * speed) * leftAndRight;
+            float newX = initialPosition.x + Mathf.Sin(Time.time * speed * speedMutliplier) * leftAndRight;
             Vector3 newPosition = new Vector3(newX, transform.position.y, transform.position.z);
 
             // Move the GameObject to the new position
             transform.position = newPosition;
         }
-
 
         public void Expire()
         {

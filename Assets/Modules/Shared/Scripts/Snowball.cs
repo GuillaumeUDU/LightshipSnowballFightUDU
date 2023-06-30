@@ -260,19 +260,27 @@ namespace Niantic.ARVoyage
             Vector3 tossRotation = this.transform.eulerAngles;
             tossRotation.x -= tossAngle;
 
-            //if (angleDelta >= 120) angleDelta = 120;
-            //else if (angleDelta <= -120) angleDelta = -120;
-
-            //if (orientationOnRelease >= 0 && orientationOnRelease < 180) tossRotation.y -= 10 * Random.Range(0.8f, 1.2f);
-            //else tossRotation.y += 10 * Random.Range(0.8f, 1.2f);
-
-            //if (angleDelta > 0) tossRotation.y -= angleDelta / 12;
-            //else if (angleDelta <= 0) tossRotation.y += angleDelta / 12;
-
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
+            // This handle the power of the snowball on console acceleration
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
+
+            float convertedAngleValue;
+
+            // Depending on the orientation of the console at release, we spin the ball
+            if (orientationOnRelease >= 0 && orientationOnRelease <= 170)
+            {
+                convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 0, 170);
+            }
+            else if (orientationOnRelease <= 360 && orientationOnRelease > 190)
+            {
+                convertedAngleValue = ConvertValueOrientation360To190(orientationOnRelease, 190, 360);
+            }
+            else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
+            {
+                convertedAngleValue = 0f;
+            }
 
             /////////////////////////
             // -up : going left    //
@@ -280,24 +288,6 @@ namespace Niantic.ARVoyage
             //  right : going down //
             // -right : going up   //
             /////////////////////////
-
-            float convertedAngleValue;
-
-            //if (orientationOnRelease >= 0 && orientationOnRelease < 180) convertedAngleValue = -.2f;
-            //else convertedAngleValue = .2f;
-
-            if (orientationOnRelease >= 0 && orientationOnRelease <= 180)
-            {
-                convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 1, 170);
-            }
-            else if (orientationOnRelease <= 360 && orientationOnRelease > 180)
-            {
-                convertedAngleValue = ConvertValueOrientation359To190(orientationOnRelease, 190, 359);
-            }
-            else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
-            {
-                convertedAngleValue = 0f;
-            }
 
             snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
 
@@ -323,7 +313,7 @@ namespace Niantic.ARVoyage
             return convertedValue;
         }
 
-        float ConvertValueOrientation359To190(float originalValue, float minValue, float maxValue)
+        float ConvertValueOrientation360To190(float originalValue, float minValue, float maxValue)
         {
             float minTargetValue = 0.2f;
             float maxTargetValue = 0f;
@@ -340,17 +330,18 @@ namespace Niantic.ARVoyage
             return convertedValue;
         }
 
-        float CalculateAngleDelta(float pressAngle, float releaseAngle)
-        {
-            float angleDelta = Mathf.DeltaAngle(pressAngle, releaseAngle);
-            return angleDelta;
-        }
 
+        // This convert console acceleration to snowball power
         float ConvertValue(float value)
         {
+            // Minimum accel of the console
             float minValue = 900f;
+            // Max accel of the console
             float maxValue = 5000f;
+
+            // Minimum power of the snowball
             float minTargetValue = 5f;
+            // Max power of the snowball
             float maxTargetValue = 30f;
 
             // Calculate the percentage of the original value within the range
