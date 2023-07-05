@@ -1,5 +1,5 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Niantic.ARDK.Extensions.Meshing;
@@ -20,6 +20,7 @@ namespace Niantic.ARVoyage.SnowballToss
 
         // Turning on and off timer and difficulty
         public bool debugMode = false;
+        public bool canSpinSnowball = true;
 
         // gets added to SnowballMaker.defaultTossAngle
         private const float snowballTossAngleDegOffset = 10f;
@@ -35,7 +36,7 @@ namespace Niantic.ARVoyage.SnowballToss
         [Header("GUI")]
         [SerializeField] private GameTimeAndScore gameTimeAndScoreGUI;
         public int gameScore { get; private set; } = 0;
-        
+
         private static int highScore;
         public int gameScoreLevel;
 
@@ -126,7 +127,7 @@ namespace Niantic.ARVoyage.SnowballToss
 
             gameScoreLevel = gameScore / 100;
             gameTimeAndScoreGUI.gameDuration += 5;
-            
+
             EventsSystemHandler.Instance.TriggerGettingPoints();
         }
 
@@ -201,6 +202,15 @@ namespace Niantic.ARVoyage.SnowballToss
                 debugMode = true;
                 gameTimeAndScoreGUI.debugMode = true;
             }
+        }
+
+        //
+        public void ToggleSnowballSpin()
+        {
+            if (canSpinSnowball)
+                canSpinSnowball = false;
+            else if (!canSpinSnowball)
+                canSpinSnowball = true;
         }
 
 

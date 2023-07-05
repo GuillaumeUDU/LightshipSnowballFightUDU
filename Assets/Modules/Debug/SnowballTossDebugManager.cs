@@ -84,5 +84,15 @@ namespace Niantic.ARVoyage.SnowballToss
 
             snowballTossManager.CleanSnowballResidue();
         }
+
+        public void DebugMapAndTime()
+        {
+            snowballTossManager.ToggleOnOffDebugMode();
+        }
+
+        public void ToggleSnowballSpin()
+        {
+            snowballTossManager.ToggleSnowballSpin();
+        }
     }
 }

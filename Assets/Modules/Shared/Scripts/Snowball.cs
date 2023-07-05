@@ -1,7 +1,7 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using UnityEngine;
+using UnityEngine;
 using System;
-
+using Niantic.ARVoyage.SnowballToss;
 using Random = UnityEngine.Random;
 
 namespace Niantic.ARVoyage
@@ -73,7 +73,6 @@ namespace Niantic.ARVoyage
         private float peakTime;
         private float releasedTime;
         private float orientationOnRelease;
-
 
         private AudioManager audioManager;
         private AbstractDataStream uduConsole;
@@ -249,8 +248,6 @@ namespace Niantic.ARVoyage
         // WERE CONSOLE MAGIC HAPPEN
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
-            orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
-
             timeTossed = Time.time;
 
             // Activate gravity/physics on snowball
@@ -267,20 +264,26 @@ namespace Niantic.ARVoyage
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
-            float convertedAngleValue;
+            if (FindObjectOfType<SnowballTossManager>().canSpinSnowball)
+            {
+                orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
+                float convertedAngleValue;
 
-            // Depending on the orientation of the console at release, we spin the ball
-            if (orientationOnRelease >= 0 && orientationOnRelease <= 170)
-            {
-                convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 0, 170);
-            }
-            else if (orientationOnRelease <= 360 && orientationOnRelease > 190)
-            {
-                convertedAngleValue = ConvertValueOrientation360To190(orientationOnRelease, 190, 360);
-            }
-            else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
-            {
-                convertedAngleValue = 0f;
+                // Depending on the orientation of the console at release, we spin the ball
+                if (orientationOnRelease >= 0 && orientationOnRelease <= 170)
+                {
+                    convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 0, 170);
+                }
+                else if (orientationOnRelease <= 360 && orientationOnRelease > 190)
+                {
+                    convertedAngleValue = ConvertValueOrientation360To190(orientationOnRelease, 190, 360);
+                }
+                else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
+                {
+                    convertedAngleValue = 0f;
+                }
+
+                snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
             }
 
             /////////////////////////
@@ -289,8 +292,6 @@ namespace Niantic.ARVoyage
             //  right : going down //
             // -right : going up   //
             /////////////////////////
-
-            snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
 
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;
