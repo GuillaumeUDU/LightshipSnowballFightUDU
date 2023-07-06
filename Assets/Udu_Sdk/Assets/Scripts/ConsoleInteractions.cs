@@ -119,13 +119,13 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
 
     void LightAndDisplayFlash()
     {
-        ConsoleIntegration.Instance.uduConsoleDatastream.SetImageVibrationAndLED("/spiffs/wint.gif", "/spiffs/bd1_01.wav", Color.green);
+        ConsoleIntegration.Instance.uduConsoleDatastream.StartVibrationAndLEDs("/spiffs/DV4_BA.wav", Color.green);
         // We display the base image and color again after 2 seconds
-        Invoke("BackToOriginalLightAndDisplay", 2f);
+        Invoke("BackToOriginalLightAndDisplay", 1f);
     }
 
     void BackToOriginalLightAndDisplay()
     {
-        ConsoleIntegration.Instance.uduConsoleDatastream.SetImageAndLEDs("/spiffs/strawberry.gif", Color.white);
+        ConsoleIntegration.Instance.uduConsoleDatastream.SetImageAndLEDs("/spiffs/snowballdisplay.gif", Color.white);
     }
 }

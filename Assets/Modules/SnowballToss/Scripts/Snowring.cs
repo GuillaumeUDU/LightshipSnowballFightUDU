@@ -611,6 +611,8 @@ namespace Niantic.ARVoyage.SnowballToss
 
         public IEnumerator SuccessRoutine(float duration = 1f, float delay = 0f)
         {
+            EventsSystemHandler.Instance.TriggerGettingPoints();
+
             System.Action onStart = () =>
             {
                 snowballTossManager?.SnowRingSucceeded();

@@ -617,7 +617,7 @@ public class BLEUDUManager : MonoBehaviour
         Thread.Sleep(300);
         SetAmplitude(100);
 
-        SetImageVibrationAndLEDs("/spiffs/intro.gif", "/spiffs/Fruit150.wav", Color.green);
+        SetImageVibrationAndLEDs("/spiffs/snowballdisplay.gif", "/spiffs/Fruit150.wav", Color.green);
 
         Connected = true;
         ConsoleIntegration.Instance.isConnected = true;

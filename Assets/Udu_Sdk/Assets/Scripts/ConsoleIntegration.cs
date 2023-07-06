@@ -49,6 +49,6 @@ public class ConsoleIntegration : Singleton<ConsoleIntegration>
 
     void ModifyConsoleDisplay()
     {
-        uduConsoleDatastream.SetImageAndLEDs("/spiffs/strawberry.gif", Color.white);
+        uduConsoleDatastream.SetImageAndLEDs("/spiffs/snowballdisplay.gif", Color.white);
     }
 }

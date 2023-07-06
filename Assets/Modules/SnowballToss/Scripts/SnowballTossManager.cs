@@ -127,8 +127,6 @@ namespace Niantic.ARVoyage.SnowballToss
 
             gameScoreLevel = gameScore / 100;
             gameTimeAndScoreGUI.gameDuration += 5;
-
-            EventsSystemHandler.Instance.TriggerGettingPoints();
         }
 
         public void SnowRingDestroyed(Snowring snowring, int currentSector)
