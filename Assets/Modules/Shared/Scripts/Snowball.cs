@@ -72,7 +72,7 @@ namespace Niantic.ARVoyage
         private float consoleCurrentAcceleration;
         private float peakTime;
         private float releasedTime;
-        private float orientationOnRelease;
+
 
 
         private AudioManager audioManager;
@@ -246,10 +246,28 @@ namespace Niantic.ARVoyage
             TossSnowball(tossAngle, force, torque);
         }
 
-        // WERE CONSOLE MAGIC HAPPEN
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
-            orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
+             float tiltThreshold = 20.0f; // Add this line to define the tilt threshold in degree
+
+            // Ondrej's experiments begin
+            Quaternion currentOrientation = uduConsole.GetOrientation();
+           
+            // Convert the current orientation quaternion to a rotation matrix
+            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(currentOrientation);
+
+            // Extract rotations in radians
+            float pitch = Mathf.Atan2(rotationMatrix.m21, rotationMatrix.m22); // Rotation around X-axis
+            float yaw = Mathf.Asin(-rotationMatrix.m20); // Rotation around Y-axis
+            float roll = Mathf.Atan2(rotationMatrix.m10, rotationMatrix.m00); // Rotation around Z-axis
+
+            // Convert rotations to degrees
+            pitch *= Mathf.Rad2Deg;
+            yaw *= Mathf.Rad2Deg;
+            roll *= Mathf.Rad2Deg;
+            // Ondrej's experiments end
+
+            //orientationOnRelease = currentOrientation.eulerAngles.x;
 
             timeTossed = Time.time;
 
@@ -267,29 +285,15 @@ namespace Niantic.ARVoyage
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
-            float convertedAngleValue;
+            // Depending on the orientation of the console at release, we spin the ball.
+            float convertedAngleValue = ConvertYawToCurve(yaw, tiltThreshold);
 
-            // Depending on the orientation of the console at release, we spin the ball
-            if (orientationOnRelease >= 0 && orientationOnRelease <= 170)
-            {
-                convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 0, 170);
-            }
-            else if (orientationOnRelease <= 360 && orientationOnRelease > 190)
-            {
-                convertedAngleValue = ConvertValueOrientation360To190(orientationOnRelease, 190, 360);
-            }
-            else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
-            {
-                convertedAngleValue = 0f;
-            }
+            Debug.Log("CURVE_TAG: Pitch: " + pitch + ", Yaw: " + yaw + ", Roll: " + roll);
+            Debug.Log("CURVE_TAG: convertedAngleValue: " + convertedAngleValue);
 
-            /////////////////////////
-            // -up : going left    //
-            //  up : going right   //
-            //  right : going down //
-            // -right : going up   //
-            /////////////////////////
+            // Ondrej's experiments End
 
+            // Apply torque
             snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
 
             // Set snowball lifetime duration
@@ -304,31 +308,37 @@ namespace Niantic.ARVoyage
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
         }
 
-        float ConvertValueOrientation0To170(float value, float rangeMin, float rangeMax)
+        float ConvertYawToCurve(float yaw, float tiltThreshold)
         {
+            // The target range for the curve, with 0 being no curve and ±0.2 being maximum curve in each direction.
             float targetMin = 0f;
             float targetMax = 0.2f;
-            value = Mathf.Clamp(value, rangeMin, rangeMax);
-            float convertedValue = targetMin + (value - rangeMin) * (targetMax - targetMin) / (rangeMax - rangeMin);
 
-            return convertedValue;
-        }
+            // Clamp the yaw value between -70 and 70.
+            yaw = Mathf.Clamp(yaw, -70f, 70f);
 
-        float ConvertValueOrientation360To190(float originalValue, float minValue, float maxValue)
-        {
-            float minTargetValue = 0.2f;
-            float maxTargetValue = 0f;
+            // Calculate the absolute yaw value
+            float absYaw = Mathf.Abs(yaw);
 
-            // Clamp the original value between the minimum and maximum values
-            float clampedValue = Mathf.Clamp(originalValue, minValue, maxValue);
+            // If the absolute yaw is less than the threshold, no curve is applied.
+            if (absYaw < tiltThreshold)
+            {
+                return 0f;
+            }
 
-            // Calculate the normalized value between 0 and 1
-            float normalizedValue = (clampedValue - minValue) / (maxValue - minValue);
+            // Calculate the normalized value between 0 and 1 based on the yaw.
+            float normalizedValue = (absYaw - tiltThreshold) / (70f - tiltThreshold);
 
-            // Map the normalized value to the target range
-            float convertedValue = Mathf.Lerp(minTargetValue, maxTargetValue, normalizedValue);
+            // Calculate the curve value.
+            float curveValue = targetMax * normalizedValue;
 
-            return convertedValue;
+            // If the original yaw was negative, make the curve negative.
+            if (yaw < 0)
+            {
+                curveValue *= -1;
+            }
+
+            return curveValue;
         }
 
 
