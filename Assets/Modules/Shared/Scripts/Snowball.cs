@@ -292,28 +292,6 @@ namespace Niantic.ARVoyage
             Debug.Log("CURVE_TAG: Pitch: " + pitch + ", Yaw: " + yaw + ", Roll: " + roll);
             Debug.Log("CURVE_TAG: convertedAngleValue: " + convertedAngleValue);
 
-            if (FindObjectOfType<SnowballTossManager>().canSpinSnowball)
-            {
-                orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
-                float convertedAngleValue;
-
-                // Depending on the orientation of the console at release, we spin the ball
-                if (orientationOnRelease >= 0 && orientationOnRelease <= 170)
-                {
-                    convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 0, 170);
-                }
-                else if (orientationOnRelease <= 360 && orientationOnRelease > 190)
-                {
-                    convertedAngleValue = ConvertValueOrientation360To190(orientationOnRelease, 190, 360);
-                }
-                else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
-                {
-                    convertedAngleValue = 0f;
-                }
-
-                snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
-            }
-
             // Apply torque
             snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
 
