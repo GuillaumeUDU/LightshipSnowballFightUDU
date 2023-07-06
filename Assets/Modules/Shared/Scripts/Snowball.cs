@@ -1,7 +1,7 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using UnityEngine;
+using UnityEngine;
 using System;
-
+using Niantic.ARVoyage.SnowballToss;
 using Random = UnityEngine.Random;
 
 namespace Niantic.ARVoyage
@@ -72,7 +72,6 @@ namespace Niantic.ARVoyage
         private float consoleCurrentAcceleration;
         private float peakTime;
         private float releasedTime;
-
 
 
         private AudioManager audioManager;
@@ -248,9 +247,10 @@ namespace Niantic.ARVoyage
 
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
+
              float tiltThreshold = 20.0f; // Add this line to define the tilt threshold in degree
 
-            // Ondrej's experiments begin
+           
             Quaternion currentOrientation = uduConsole.GetOrientation();
            
             // Convert the current orientation quaternion to a rotation matrix
@@ -285,13 +285,34 @@ namespace Niantic.ARVoyage
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
+
             // Depending on the orientation of the console at release, we spin the ball.
             float convertedAngleValue = ConvertYawToCurve(yaw, tiltThreshold);
 
             Debug.Log("CURVE_TAG: Pitch: " + pitch + ", Yaw: " + yaw + ", Roll: " + roll);
             Debug.Log("CURVE_TAG: convertedAngleValue: " + convertedAngleValue);
 
-            // Ondrej's experiments End
+            if (FindObjectOfType<SnowballTossManager>().canSpinSnowball)
+            {
+                orientationOnRelease = uduConsole.GetOrientation().eulerAngles.x;
+                float convertedAngleValue;
+
+                // Depending on the orientation of the console at release, we spin the ball
+                if (orientationOnRelease >= 0 && orientationOnRelease <= 170)
+                {
+                    convertedAngleValue = -1 * ConvertValueOrientation0To170(orientationOnRelease, 0, 170);
+                }
+                else if (orientationOnRelease <= 360 && orientationOnRelease > 190)
+                {
+                    convertedAngleValue = ConvertValueOrientation360To190(orientationOnRelease, 190, 360);
+                }
+                else /*if (orientationOnRelease > 340 || orientationOnRelease < 20)*/
+                {
+                    convertedAngleValue = 0f;
+                }
+
+                snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
+            }
 
             // Apply torque
             snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
