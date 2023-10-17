@@ -69,8 +69,11 @@ namespace Niantic.ARVoyage
 
             if (levelSwitcher != null)
             {
+                // We quit the app here
+                Application.Quit();
+
                 Debug.Log("Return to homeland");
-                levelSwitcher.ReturnToHomeland();
+                //levelSwitcher.ReturnToHomeland();
             }
             else
             {

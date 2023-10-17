@@ -1,5 +1,5 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Niantic.ARDK.Extensions.Meshing;
@@ -14,9 +14,13 @@ namespace Niantic.ARVoyage.SnowballToss
     {
         public const int minVictoryPoints = scoreIncrementPerRing * 4;
         private const int scoreIncrementPerRing = 100;
-        public const int gameDuration = 45;
+        public static int gameDuration = 45;
         public const int nearGameEndDuration = 5;
-        private const int maxNumSnowrings = 3;
+        private int maxNumSnowrings = 3;
+
+        // Turning on and off timer and difficulty
+        public bool debugMode = false;
+        public bool canSpinSnowball = true;
 
         // gets added to SnowballMaker.defaultTossAngle
         private const float snowballTossAngleDegOffset = 10f;
@@ -33,15 +37,19 @@ namespace Niantic.ARVoyage.SnowballToss
         [SerializeField] private GameTimeAndScore gameTimeAndScoreGUI;
         public int gameScore { get; private set; } = 0;
 
+        private static int highScore;
+        public int gameScoreLevel;
+
         public List<Snowring> snowrings { get; private set; } = new List<Snowring>();
         private Snowring newSnowringSearchingForPlacement;
         private int snowringCtr = 0;
         private float nextSnowringStartTime = 0f;
         public int lastDestroyedSnowringSector { get; private set; } = -1;
+        public int HighScore { get => highScore; set => highScore = value; }
 
-        private const float secsTillFirstSnowring = 0f;
-        private const float secsTillNextSnowring = 2.5f;
-        private const float secsTillReplacementSnowring = 0f;
+        private float secsTillFirstSnowring = 0f;
+        private float secsTillNextSnowring = 2.5f;
+        private float secsTillReplacementSnowring = 0f;
 
 
         void OnEnable()
@@ -54,6 +62,12 @@ namespace Niantic.ARVoyage.SnowballToss
             snowballMaker.tossAngle = SnowballMaker.defaultTossAngle + snowballTossAngleDegOffset;
         }
 
+        private void Start()
+        {
+            // Load the existing high score from PlayerPrefs
+            highScore = PlayerPrefs.GetInt("HighScore", 0);
+            debugMode = false;
+        }
 
         public void InitTossGame()
         {
@@ -109,8 +123,10 @@ namespace Niantic.ARVoyage.SnowballToss
         public void SnowRingSucceeded()
         {
             gameScore += scoreIncrementPerRing;
-
             gameTimeAndScoreGUI.IncrementScore(scoreIncrementPerRing);
+
+            gameScoreLevel = gameScore / 100;
+            gameTimeAndScoreGUI.gameDuration += 5;
         }
 
         public void SnowRingDestroyed(Snowring snowring, int currentSector)
@@ -152,6 +168,72 @@ namespace Niantic.ARVoyage.SnowballToss
             foreach (SnowballSplat splat in snowballSplats)
             {
                 Destroy(splat.gameObject);
+            }
+        }
+
+        public static void SaveHighScore(int score)
+        {
+            // Update the high score if the new score is higher
+            if (score > highScore)
+            {
+                highScore = score;
+                PlayerPrefs.SetInt("HighScore", highScore);
+            }
+        }
+
+        public static void ResetHighScore()
+        {
+            // Reset the high score to 0
+            highScore = 0;
+            PlayerPrefs.SetInt("HighScore", highScore);
+        }
+
+        public void ToggleOnOffDebugMode()
+        {
+            if (debugMode)
+            {
+                debugMode = false;
+                gameTimeAndScoreGUI.debugMode = false;
+            }
+            else
+            {
+                debugMode = true;
+                gameTimeAndScoreGUI.debugMode = true;
+            }
+        }
+
+        //
+        public void ToggleSnowballSpin()
+        {
+            if (canSpinSnowball)
+                canSpinSnowball = false;
+            else if (!canSpinSnowball)
+                canSpinSnowball = true;
+        }
+
+
+        // Additionnal diffuctly settings for spawn speed and max of snowring, not used cause make game too difficult
+        void GameDifficulty(int scoreLevel)
+        {
+            switch (scoreLevel)
+            {
+                case int n when n >= 4 && n <= 8:
+                    secsTillNextSnowring = 2f;
+                    maxNumSnowrings = 4;
+                    break;
+
+                case int n when n >= 9 && n <= 13:
+                    secsTillNextSnowring = 1.75f;
+                    maxNumSnowrings = 5;
+                    break;
+
+                case int n when n >= 14 && n <= 18:
+                    secsTillNextSnowring = 1.25f;
+                    maxNumSnowrings = 6;
+                    break;
+
+                default:
+                    break;
             }
         }
     }

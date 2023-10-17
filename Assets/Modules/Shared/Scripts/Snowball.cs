@@ -1,7 +1,7 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using UnityEngine;
+using UnityEngine;
 using System;
-
+using Niantic.ARVoyage.SnowballToss;
 using Random = UnityEngine.Random;
 
 namespace Niantic.ARVoyage
@@ -67,7 +67,15 @@ namespace Niantic.ARVoyage
         private int impactCount = 0;            // Current number of impacts.
         private float lastImpact = 0;           // Moment of previous impact.
 
+        private bool triggerPressed;
+        private float consolePeakAcceleration;
+        private float consoleCurrentAcceleration;
+        private float peakTime;
+        private float releasedTime;
+
+
         private AudioManager audioManager;
+        private AbstractDataStream uduConsole;
 
         public string SpawnerDescription { get; private set; }
 
@@ -80,6 +88,27 @@ namespace Niantic.ARVoyage
             audioManager = SceneLookup.Get<AudioManager>();
 
             ShowVFX(false);
+
+            uduConsole = ConsoleIntegration.Instance.uduConsoleDatastream;
+        }
+
+        private void Start()
+        {
+            EventsSystemHandler.Instance.onTriggerPressTriggerButton += TriggerButtonPressed;
+            EventsSystemHandler.Instance.onTriggerReleaseTriggerButton += TriggerButtonReleased;
+        }
+
+        private void TriggerButtonPressed()
+        {
+            triggerPressed = true;
+            consolePeakAcceleration = 0;
+            peakTime = 0;
+            releasedTime = 0;
+        }
+
+        private void TriggerButtonReleased()
+        {
+            triggerPressed = false;
         }
 
         public void InitSnowball(string spawnerDescription, Transform newParent = null)
@@ -146,6 +175,26 @@ namespace Niantic.ARVoyage
                     Expire(destroy: true);
                 }
             }
+
+            ConsolePickAcceleration();
+            //Debug.Log("X: " + uduConsole.GetOrientation().eulerAngles.x);
+        }
+
+        private void ConsolePickAcceleration()
+        {
+            if (!triggerPressed) return;
+
+            // Update the variable value
+            consoleCurrentAcceleration = uduConsole.GetAcceleration().magnitude;
+
+            releasedTime = Time.time;
+
+            if (triggerPressed && consoleCurrentAcceleration > consolePeakAcceleration)
+            {
+                // Update the max value if the current value is higher
+                consolePeakAcceleration = consoleCurrentAcceleration;
+                peakTime = Time.time;
+            }
         }
 
 
@@ -184,7 +233,6 @@ namespace Niantic.ARVoyage
         {
             Vector3 force = transform.forward * tossForce;
             Vector3 torque = transform.right * Random.Range(1, 3);
-
             TossSnowball(tossAngle, force, torque);
 
             EventLocallySpawnedSnowballTossed.Invoke(this, tossAngle, force, torque);
@@ -199,6 +247,28 @@ namespace Niantic.ARVoyage
 
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
+
+             float tiltThreshold = 20.0f; // Add this line to define the tilt threshold in degree
+
+           
+            Quaternion currentOrientation = uduConsole.GetOrientation();
+           
+            // Convert the current orientation quaternion to a rotation matrix
+            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(currentOrientation);
+
+            // Extract rotations in radians
+            float pitch = Mathf.Atan2(rotationMatrix.m21, rotationMatrix.m22); // Rotation around X-axis
+            float yaw = Mathf.Asin(-rotationMatrix.m20); // Rotation around Y-axis
+            float roll = Mathf.Atan2(rotationMatrix.m10, rotationMatrix.m00); // Rotation around Z-axis
+
+            // Convert rotations to degrees
+            pitch *= Mathf.Rad2Deg;
+            yaw *= Mathf.Rad2Deg;
+            roll *= Mathf.Rad2Deg;
+            // Ondrej's experiments end
+
+            //orientationOnRelease = currentOrientation.eulerAngles.x;
+
             timeTossed = Time.time;
 
             // Activate gravity/physics on snowball
@@ -208,10 +278,22 @@ namespace Niantic.ARVoyage
             // Toss snowball upward and forward with force
             Vector3 tossRotation = this.transform.eulerAngles;
             tossRotation.x -= tossAngle;
+
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
-            snowballRigidbody.AddForce(this.transform.forward * tossForce);
-            snowballRigidbody.AddTorque(this.transform.right * Random.Range(1, 3));
+            // This handle the power of the snowball on console acceleration
+            if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
+            else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
+
+
+            // Depending on the orientation of the console at release, we spin the ball.
+            float convertedAngleValue = ConvertYawToCurve(yaw, tiltThreshold);
+
+            Debug.Log("CURVE_TAG: Pitch: " + pitch + ", Yaw: " + yaw + ", Roll: " + roll);
+            Debug.Log("CURVE_TAG: convertedAngleValue: " + convertedAngleValue);
+
+            // Apply torque
+            snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
 
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;
@@ -225,9 +307,65 @@ namespace Niantic.ARVoyage
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
         }
 
+        float ConvertYawToCurve(float yaw, float tiltThreshold)
+        {
+            // The target range for the curve, with 0 being no curve and ±0.2 being maximum curve in each direction.
+            float targetMin = 0f;
+            float targetMax = 0.2f;
+
+            // Clamp the yaw value between -70 and 70.
+            yaw = Mathf.Clamp(yaw, -70f, 70f);
+
+            // Calculate the absolute yaw value
+            float absYaw = Mathf.Abs(yaw);
+
+            // If the absolute yaw is less than the threshold, no curve is applied.
+            if (absYaw < tiltThreshold)
+            {
+                return 0f;
+            }
+
+            // Calculate the normalized value between 0 and 1 based on the yaw.
+            float normalizedValue = (absYaw - tiltThreshold) / (70f - tiltThreshold);
+
+            // Calculate the curve value.
+            float curveValue = targetMax * normalizedValue;
+
+            // If the original yaw was negative, make the curve negative.
+            if (yaw < 0)
+            {
+                curveValue *= -1;
+            }
+
+            return curveValue;
+        }
+
+
+        // This convert console acceleration to snowball power
+        float ConvertValue(float value)
+        {
+            // Minimum accel of the console
+            float minValue = 900f;
+            // Max accel of the console
+            float maxValue = 5000f;
+
+            // Minimum power of the snowball
+            float minTargetValue = 5f;
+            // Max power of the snowball
+            float maxTargetValue = 30f;
+
+            // Calculate the percentage of the original value within the range
+            float percentage = (value - minValue) / (maxValue - minValue);
+
+            // Map the percentage to the target range
+            float targetValue = minTargetValue + (maxTargetValue - minTargetValue) * percentage;
+
+            return targetValue;
+        }
+
         void OnCollisionEnter(Collision collision)
         {
-            Debug.Log("Snowball OnCollisionEnter for " + this);
+            //Debug.Log("Snowball OnCollisionEnter for " + this);
 
             // Filter out collisions if we've decided to burst already.
             if (hasBurst) return;
@@ -243,7 +381,7 @@ namespace Niantic.ARVoyage
         // Default collision handling logic
         public void HandleCollision(Collision collision, bool destroy = true)
         {
-            Debug.Log("Handle collision for " + this);
+            //Debug.Log("Handle collision for " + this);
 
             // If we hit anything other than environment layers,
             // then always destroy the snowball.
@@ -328,12 +466,15 @@ namespace Niantic.ARVoyage
 
         public void Burst(Vector3 position, Vector3 normal, bool showSecondaryParticles = false)
         {
+            //Console outputs
+            //if (uduConsole != null) uduConsole.SetVibrationAndStart("/spiffs/bd1_01.wav", false);
+
             // Always hide the VFX
             ShowVFX(false);
 
             if (snowballBurstPrefab != null && !hasBurst)
             {
-                Debug.Log("Burst snowball " + this + " isHeld? " + IsHeld);
+                //Debug.Log("Burst snowball " + this + " isHeld? " + IsHeld);
 
                 GameObject snowballBurstInstance = Instantiate(snowballBurstPrefab,
                                                                 position,
@@ -349,6 +490,8 @@ namespace Niantic.ARVoyage
 
                 // SFX
                 audioManager.PlayAudioAtPosition(AudioKeys.SFX_Snowball_Bump, position);
+
+
             }
         }
 

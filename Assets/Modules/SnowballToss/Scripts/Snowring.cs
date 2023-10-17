@@ -32,6 +32,13 @@ namespace Niantic.ARVoyage.SnowballToss
         private float maxXAxisAngle = 15f;
         private const float maxScale = 0.5f;
 
+        // Value for moving the rings
+        private float upAndDown;
+        private float leftAndRight;
+        private float speed = 2f;
+        private float rotatingSpeed = 35f;
+        private int ringMove;
+
         private int currentSector = 0;
 
         private const int numPlacementSectors = 360 / 30;
@@ -44,6 +51,7 @@ namespace Niantic.ARVoyage.SnowballToss
         private const int tooManySamplesTried = 300;
         private const float secsTillRecheckForNewlyFoundMesh = 0.5f;
         private float recheckMeshOverlapTime = 0f;
+        private Vector3 initialPosition;
 
         private const float spacingRadius = 0.4f;
         private const float samplingDistIncrement = spacingRadius / 2f;
@@ -54,6 +62,9 @@ namespace Niantic.ARVoyage.SnowballToss
         private bool isPlaced = false;
         private bool isSuccess = false;
         private bool isExpiring = false;
+        private bool initialPositionInit = false;
+
+        private float direction = 1f;
 
         private AudioManager audioManager;
 
@@ -98,6 +109,41 @@ namespace Niantic.ARVoyage.SnowballToss
 
             audioManager = SceneLookup.Get<AudioManager>();
         }
+        private void Start()
+        {
+            if (!snowballTossManager.debugMode)
+            {
+                ManagingDifficutlySpeedAndDistanceOfRings();
+                initialPositionInit = false;
+            }
+        }
+        void ManagingDifficutlySpeedAndDistanceOfRings()
+        {
+            initialPosition = this.transform.position;
+
+            // Picking if the ring is gonna move up and down OR left and right
+            ringMove = Random.Range(0, 2);
+
+            // If 1 = ring move up and down
+            if (ringMove == 1)
+            {
+                // Travel distance of the ring
+                upAndDown = Random.Range(-.2f, .2f);
+                leftAndRight = 0;
+            }
+
+            // If 0 = ring left and right
+            if (ringMove == 0)
+            {
+                upAndDown = 0;
+                // Travel distance of the ring
+                leftAndRight = Random.Range(-.2f, .2f);
+            }
+
+            //// range of speed the ring is moving
+            //speed = Random.Range(.15f, .35f);
+        }
+
 
 
         // Possibly called multiple times, no more than once per frame, 
@@ -149,17 +195,22 @@ namespace Niantic.ARVoyage.SnowballToss
             if (!isPlaced) return;
 
             // Time to check for overlap with newly found mesh?
-            if (!isSuccess && !isExpiring && Time.time > recheckMeshOverlapTime)
+            if (!isSuccess && !isExpiring)
             {
-                recheckMeshOverlapTime = Time.time + secsTillRecheckForNewlyFoundMesh;
-
-                string collisionName;
-                int numOverlappingColliders = GetNumOverlappingColliders(spacingRadius, out collisionName);
-                if (numOverlappingColliders > 0)
+                if (Time.time > recheckMeshOverlapTime)
                 {
-                    Debug.Log("Snowring recheck collision with " + collisionName + "; expiring, age " + (Time.time - startTime) + "s");
-                    Expire();
+                    recheckMeshOverlapTime = Time.time + secsTillRecheckForNewlyFoundMesh;
+
+                    string collisionName;
+                    int numOverlappingColliders = GetNumOverlappingColliders(spacingRadius, out collisionName);
+                    if (numOverlappingColliders > 0)
+                    {
+                        Debug.Log("Snowring recheck collision with " + collisionName + "; expiring, age " + (Time.time - startTime) + "s");
+                        Expire();
+                    }
                 }
+
+                SnowRingBehaviorOnScore(snowballTossManager.gameScoreLevel);
             }
 
             // Time to autonomously end this ring?
@@ -322,9 +373,9 @@ namespace Niantic.ARVoyage.SnowballToss
             if (validPosition != Vector3.zero)
             {
                 // Put the snowring at the valid position
-                Debug.Log("New snowring, dist " + validPositionDist +
-                            ", num samples tried " + numSamplesTried +
-                            " over " + (Time.time - timeStartedSampling) + "s");
+                //Debug.Log("New snowring, dist " + validPositionDist +
+                //            ", num samples tried " + numSamplesTried +
+                //            " over " + (Time.time - timeStartedSampling) + "s");
                 this.transform.position = validPosition;
 
                 // Rotate the ring to face the camera
@@ -465,6 +516,64 @@ namespace Niantic.ARVoyage.SnowballToss
             StartCoroutine(SuccessRoutine(successDuration, successDelay));
         }
 
+        public void SnowRingBehaviorOnScore(int score)
+        {
+            // If we enabled debug mode, snowring stop moving/rotating
+            if (snowballTossManager.debugMode) return;
+
+            switch (score)
+            {
+                // If score is between 400 and 800 we can only move left to right
+                case int n when n >= 4 && n <= 8:
+                    Move(1);
+                    break;
+
+                // If score is between 900 and 1300 we can move up and down OR left to right
+                case int n when n >= 9 && n <= 13:
+                    Move(1.2f);
+                    break;
+
+                // If score is higher than 1400 the rings can also rotate
+                case int n when n >= 14:
+                    // Rotating ring at given speed
+                    RotateSnowring(rotatingSpeed);
+                    Move(1.5f);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        public void RotateSnowring(float rotateSpeed)
+        {
+            this.transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
+        }
+        void Move(float speedMutliplier)
+        {
+            if (ringMove==1) MoveUpAndDown(speedMutliplier);
+            else MoveLeftAndRight(speedMutliplier);
+        }
+
+        private void MoveUpAndDown(float speedMutliplier)
+        {
+            // Calculate the new position using a sine wave
+            float newY = initialPosition.y + Mathf.Sin(Time.time * speed * speedMutliplier) * upAndDown;
+            Vector3 newPosition = new Vector3(transform.position.x, newY, transform.position.z);
+
+            // Move the GameObject to the new position
+            transform.position = newPosition;
+        }
+
+        private void MoveLeftAndRight(float speedMutliplier)
+        {
+            // Calculate the new position using a sine wave
+            float newX = initialPosition.x + Mathf.Sin(Time.time * speed * speedMutliplier) * leftAndRight;
+            Vector3 newPosition = new Vector3(newX, transform.position.y, transform.position.z);
+
+            // Move the GameObject to the new position
+            transform.position = newPosition;
+        }
 
         public void Expire()
         {
@@ -502,6 +611,8 @@ namespace Niantic.ARVoyage.SnowballToss
 
         public IEnumerator SuccessRoutine(float duration = 1f, float delay = 0f)
         {
+            EventsSystemHandler.Instance.TriggerGettingPoints();
+
             System.Action onStart = () =>
             {
                 snowballTossManager?.SnowRingSucceeded();

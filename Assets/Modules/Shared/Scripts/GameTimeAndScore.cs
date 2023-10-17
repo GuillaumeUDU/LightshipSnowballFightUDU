@@ -26,6 +26,8 @@ namespace Niantic.ARVoyage
         protected const float scoreIncrementFadeDuration = 1f;
         protected const float scoreIncrementYRise = 25f;
 
+        public bool debugMode;
+
         public int gameScore { get; set; } = 0;
         public int gameDuration { get; set; } = 0;
         public int nearGameEndDuration { get; set; } = 0;
@@ -75,6 +77,9 @@ namespace Niantic.ARVoyage
 
         private void UpdateGameTimeDisplay()
         {
+            // If debug mode is ON, we stop the countdown
+            if (debugMode) return;
+
             int numSecsIntoState = (int)(Time.time - timeStarted);
             int latestCountdown = gameDuration - numSecsIntoState;
             if (curCountdown != latestCountdown)

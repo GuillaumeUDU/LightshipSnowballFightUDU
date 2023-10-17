@@ -66,7 +66,7 @@ namespace Niantic.ARVoyage
             resetProgressGUI.gameObject.SetActive(false);
             ButtonSFX();
 
-            Debug.Log("Reset Progress confirmed");
+            //Debug.Log("Reset Progress confirmed");
 
             // reset progress
             PersistentDataUtility.Clear();

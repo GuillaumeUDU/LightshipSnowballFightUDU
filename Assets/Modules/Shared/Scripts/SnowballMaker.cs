@@ -15,7 +15,7 @@ namespace Niantic.ARVoyage
     {
         public const float defaultTossAngle = 30f;
         private const float zDistFromButton = 0.4f;
-        private const float secsTillNextSnowball = 1f;
+        private const float secsTillNextSnowball = .5f;
 
         [SerializeField] public GameObject snowballPrefab;
         [SerializeField] private GameObject snowballTossButton;

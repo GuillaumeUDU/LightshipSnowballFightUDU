@@ -312,13 +312,13 @@ namespace Niantic.ARVoyage
 
         public AudioSource PlayAudioOnPoolSource(AudioClip clip, Transform targetTransform, Vector3 position, float volume, float spatialBlend, bool loop, float fadeInDuration, double dspDelay)
         {
-            Debug.LogFormat("{0} PlayAudioOnPoolSource: [clip {1}] [target {2}] [volume {3}] [spatialBlend {4}] [loop {5}]",
-                this,
-                clip.name,
-                targetTransform != null ? targetTransform.name : position.ToString(),
-                volume,
-                spatialBlend,
-                loop);
+            //Debug.LogFormat("{0} PlayAudioOnPoolSource: [clip {1}] [target {2}] [volume {3}] [spatialBlend {4}] [loop {5}]",
+            //    this,
+            //    clip.name,
+            //    targetTransform != null ? targetTransform.name : position.ToString(),
+            //    volume,
+            //    spatialBlend,
+            //    loop);
 
             AudioSource source = GetAudioSourceToUse();
             source.gameObject.SetActive(true);
@@ -368,7 +368,7 @@ namespace Niantic.ARVoyage
                 source.volume = volume;
             }
 
-            Debug.LogFormat("Playing clip [{0}] on source [{1}]", clip.name, source.name);
+            //Debug.LogFormat("Playing clip [{0}] on source [{1}]", clip.name, source.name);
 
             return source;
         }
