@@ -17,6 +17,8 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
         EventsSystemHandler.Instance.onTriggerReleaseSqueezeButton += SqueezeReleased;
         EventsSystemHandler.Instance.onTriggerPressTrackpadButton += InteractionWithTrackpad;
         EventsSystemHandler.Instance.onTriggerReleaseTrackpadButton += TrackpadReleased;
+        EventsSystemHandler.Instance.onTriggerGettingPoints += LightAndDisplayFlash;
+
     }
 
     private void InteractionWithTriggerRelease()
@@ -28,6 +30,7 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
         // loop check to see if a popup or an enemy that is getting interacted with (NEEDED)
 
         GameObject snowballToss = GameObject.Find("SnowballTossButton");
+        // Those are the names of the two previous popup for the snowball game: 'StartButton' 'OkButton'
 
         if (snowballToss != null)
         {
@@ -112,5 +115,17 @@ public class ConsoleInteractions : Singleton<ConsoleInteractions>
         }
         //triggerClicked.triggers[0].callback.Invoke(null);
         //Debug.Log("btn  name: " + buttonGO.transform.name);
+    }
+
+    void LightAndDisplayFlash()
+    {
+        ConsoleIntegration.Instance.uduConsoleDatastream.StartVibrationAndLEDs("/spiffs/DV4_BA.wav", Color.green);
+        // We display the base image and color again after 2 seconds
+        Invoke("BackToOriginalLightAndDisplay", 1f);
+    }
+
+    void BackToOriginalLightAndDisplay()
+    {
+        ConsoleIntegration.Instance.uduConsoleDatastream.SetImageAndLEDs("/spiffs/snowballdisplay.gif", Color.white);
     }
 }

@@ -134,10 +134,10 @@ public class BLEDataStream : AbstractDataStream
         byte[] qzBytes = new byte[2] { motionStream[20], motionStream[21] };
         byte[] qwBytes = new byte[2] { motionStream[22], motionStream[23] };
 
-        _orientation.x = System.BitConverter.ToInt16(qxBytes, 0);
-        _orientation.y = System.BitConverter.ToInt16(qyBytes, 0);
-        _orientation.z = System.BitConverter.ToInt16(qzBytes, 0);
-        _orientation.w = System.BitConverter.ToInt16(qwBytes, 0);
+        _orientation.x = System.BitConverter.ToInt16(qxBytes, 0) / 16384.0f;
+        _orientation.y = System.BitConverter.ToInt16(qyBytes, 0) / 16384.0f;
+        _orientation.z = System.BitConverter.ToInt16(qzBytes, 0) / 16384.0f;
+        _orientation.w = System.BitConverter.ToInt16(qwBytes, 0) / 16384.0f;
     }
 
     protected override void SetMagneticHeading()

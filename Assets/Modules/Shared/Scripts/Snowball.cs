@@ -1,7 +1,7 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using UnityEngine;
+using UnityEngine;
 using System;
-
+using Niantic.ARVoyage.SnowballToss;
 using Random = UnityEngine.Random;
 
 namespace Niantic.ARVoyage
@@ -72,8 +72,6 @@ namespace Niantic.ARVoyage
         private float consoleCurrentAcceleration;
         private float peakTime;
         private float releasedTime;
-        private float orientationOnPress;
-        private float orientationOnRelease;
 
 
         private AudioManager audioManager;
@@ -106,15 +104,11 @@ namespace Niantic.ARVoyage
             consolePeakAcceleration = 0;
             peakTime = 0;
             releasedTime = 0;
-            orientationOnPress = uduConsole.GetMagneticHeading();
-            //Debug.Log("HEADING ON PRESS: " + uduConsole.GetMagneticHeading());
-
         }
 
         private void TriggerButtonReleased()
         {
             triggerPressed = false;
-            //Debug.Log("HEADING ON RELEASE: " + uduConsole.GetMagneticHeading());
         }
 
         public void InitSnowball(string spawnerDescription, Transform newParent = null)
@@ -183,7 +177,7 @@ namespace Niantic.ARVoyage
             }
 
             ConsolePickAcceleration();
-            Debug.Log("X:" + uduConsole.GetOrientation().eulerAngles.x);
+            //Debug.Log("X: " + uduConsole.GetOrientation().eulerAngles.x);
         }
 
         private void ConsolePickAcceleration()
@@ -253,11 +247,29 @@ namespace Niantic.ARVoyage
 
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
-            orientationOnRelease = uduConsole.GetMagneticHeading();
 
-            float angleDelta = CalculateAngleDelta(orientationOnPress, orientationOnRelease);
+             float tiltThreshold = 20.0f; // Add this line to define the tilt threshold in degree
+
+           
+            Quaternion currentOrientation = uduConsole.GetOrientation();
+           
+            // Convert the current orientation quaternion to a rotation matrix
+            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(currentOrientation);
+
+            // Extract rotations in radians
+            float pitch = Mathf.Atan2(rotationMatrix.m21, rotationMatrix.m22); // Rotation around X-axis
+            float yaw = Mathf.Asin(-rotationMatrix.m20); // Rotation around Y-axis
+            float roll = Mathf.Atan2(rotationMatrix.m10, rotationMatrix.m00); // Rotation around Z-axis
+
+            // Convert rotations to degrees
+            pitch *= Mathf.Rad2Deg;
+            yaw *= Mathf.Rad2Deg;
+            roll *= Mathf.Rad2Deg;
+            // Ondrej's experiments end
+
+            //orientationOnRelease = currentOrientation.eulerAngles.x;
+
             timeTossed = Time.time;
-
 
             // Activate gravity/physics on snowball
             snowballRigidbody.isKinematic = false;
@@ -267,32 +279,22 @@ namespace Niantic.ARVoyage
             Vector3 tossRotation = this.transform.eulerAngles;
             tossRotation.x -= tossAngle;
 
-            if (angleDelta >= 120) angleDelta = 120;
-            else if (angleDelta <= -120) angleDelta = -120;
-
-            if (angleDelta > 0) tossRotation.y -= angleDelta / 12;
-            else if (angleDelta <= 0) tossRotation.y += angleDelta / 12;
-
-            // 10 feels like a good angle paired with a radius of 0.333 of the magnus effect
-            //tossRotation.y -= 10;
-
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
+            // This handle the power of the snowball on console acceleration
             if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
-            /////////////////////////////
-            //// -up : going left    ////
-            ////  up : going right   ////
-            ////  right : going down ////
-            //// -right : going up   ////
-            /////////////////////////////
 
-            //snowballRigidbody.AddTorque(this.transform.up * (Random.Range(1, 3) * 0.2f));
-            float convertedAngleValue = (angleDelta / 120f) * 0.2f;
-            if (angleDelta > 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
-            else if (angleDelta <= 0) snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
-            Debug.Log("ANGLE: " + angleDelta);
+            // Depending on the orientation of the console at release, we spin the ball.
+            float convertedAngleValue = ConvertYawToCurve(yaw, tiltThreshold);
+
+            Debug.Log("CURVE_TAG: Pitch: " + pitch + ", Yaw: " + yaw + ", Roll: " + roll);
+            Debug.Log("CURVE_TAG: convertedAngleValue: " + convertedAngleValue);
+
+            // Apply torque
+            snowballRigidbody.AddTorque(this.transform.up * convertedAngleValue);
+
             // Set snowball lifetime duration
             expireTime = Time.time + maxLifetime;
 
@@ -305,26 +307,58 @@ namespace Niantic.ARVoyage
             audioManager.PlayAudioAtPosition(AudioKeys.SFX_SnowballThrow, this.gameObject.transform.position);
         }
 
-        float CalculateAngleDelta(float pressAngle, float releaseAngle)
+        float ConvertYawToCurve(float yaw, float tiltThreshold)
         {
-            float angleDelta = Mathf.DeltaAngle(pressAngle, releaseAngle);
-            return angleDelta;
+            // The target range for the curve, with 0 being no curve and ±0.2 being maximum curve in each direction.
+            float targetMin = 0f;
+            float targetMax = 0.2f;
+
+            // Clamp the yaw value between -70 and 70.
+            yaw = Mathf.Clamp(yaw, -70f, 70f);
+
+            // Calculate the absolute yaw value
+            float absYaw = Mathf.Abs(yaw);
+
+            // If the absolute yaw is less than the threshold, no curve is applied.
+            if (absYaw < tiltThreshold)
+            {
+                return 0f;
+            }
+
+            // Calculate the normalized value between 0 and 1 based on the yaw.
+            float normalizedValue = (absYaw - tiltThreshold) / (70f - tiltThreshold);
+
+            // Calculate the curve value.
+            float curveValue = targetMax * normalizedValue;
+
+            // If the original yaw was negative, make the curve negative.
+            if (yaw < 0)
+            {
+                curveValue *= -1;
+            }
+
+            return curveValue;
         }
 
+
+        // This convert console acceleration to snowball power
         float ConvertValue(float value)
         {
+            // Minimum accel of the console
             float minValue = 900f;
+            // Max accel of the console
             float maxValue = 5000f;
-            float minTargetValue = 10f;
-            float maxTargetValue = 40f;
+
+            // Minimum power of the snowball
+            float minTargetValue = 5f;
+            // Max power of the snowball
+            float maxTargetValue = 30f;
 
             // Calculate the percentage of the original value within the range
             float percentage = (value - minValue) / (maxValue - minValue);
 
             // Map the percentage to the target range
             float targetValue = minTargetValue + (maxTargetValue - minTargetValue) * percentage;
-
-            Debug.Log("SNOWBALL SPEED:" + targetValue);
 
             return targetValue;
         }
@@ -432,6 +466,9 @@ namespace Niantic.ARVoyage
 
         public void Burst(Vector3 position, Vector3 normal, bool showSecondaryParticles = false)
         {
+            //Console outputs
+            //if (uduConsole != null) uduConsole.SetVibrationAndStart("/spiffs/bd1_01.wav", false);
+
             // Always hide the VFX
             ShowVFX(false);
 
@@ -453,6 +490,8 @@ namespace Niantic.ARVoyage
 
                 // SFX
                 audioManager.PlayAudioAtPosition(AudioKeys.SFX_Snowball_Bump, position);
+
+
             }
         }
 

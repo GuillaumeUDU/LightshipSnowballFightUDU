@@ -99,4 +99,13 @@ public class EventsSystemHandler : Singleton<EventsSystemHandler>
             onTriggerReleaseTrackpadButton();
         }
     }
+
+    public event Action onTriggerGettingPoints;
+    internal void TriggerGettingPoints()
+    {
+        if (onTriggerGettingPoints != null)
+        {
+            onTriggerGettingPoints();
+        }
+    }
 }

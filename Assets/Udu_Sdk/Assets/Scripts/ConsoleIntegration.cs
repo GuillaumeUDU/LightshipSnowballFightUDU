@@ -41,6 +41,14 @@ public class ConsoleIntegration : Singleton<ConsoleIntegration>
     {
         GameObject connectingScreen = this.transform.Find("LoadingCanvas").gameObject;
         connectingScreen.SetActive(false);
+
         Debug.Log("console is connected");
+
+        ModifyConsoleDisplay();
+    }
+
+    void ModifyConsoleDisplay()
+    {
+        uduConsoleDatastream.SetImageAndLEDs("/spiffs/snowballdisplay.gif", Color.white);
     }
 }
