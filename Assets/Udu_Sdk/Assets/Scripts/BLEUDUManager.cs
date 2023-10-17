@@ -47,7 +47,7 @@ public class BLEUDUManager : MonoBehaviour
             BluetoothLEHardwareInterface.Initialize(true, true, () =>
             {
                 StatusMessage = "Setting up connection with BLE device...";
-                SetState(States.Scan, 0.5f);
+                SetState(States.Scan, 0.1f);
 
             }, (error) =>
             {
@@ -89,7 +89,7 @@ public class BLEUDUManager : MonoBehaviour
                                     // found a device with the name we want
                                     // this example does not deal with finding more than one
                                     _deviceAddress = address;
-                                    SetState(States.Connect, 0.5f);
+                                    SetState(States.Connect, 0.1f);
                                 }
                             }
                         }, (address, name, rssi, bytes) =>
@@ -110,14 +110,14 @@ public class BLEUDUManager : MonoBehaviour
                                     // found a device with the name we want
                                     // this example does not deal with finding more than one
                                     _deviceAddress = address;
-                                    SetState(States.Connect, 0.5f);
+                                    SetState(States.Connect, 0.1f);
                                 }
                             }
 
                         }, _rssiOnly); // this last setting allows RFduino to send RSSI without having manufacturer data
 
                         if (_rssiOnly)
-                            SetState(States.ScanRSSI, 0.5f);
+                            SetState(States.ScanRSSI, 0.1f);
                         break;
 
                     case States.ScanRSSI:
@@ -127,7 +127,7 @@ public class BLEUDUManager : MonoBehaviour
                         StatusMessage = "Connecting...";
                         BluetoothLEHardwareInterface.ConnectToPeripheral(_deviceAddress, null, null, (address, serviceUUID, characteristicUUID) =>
                         {
-                            SetState(States.RequestMTU, 2f);
+                            SetState(States.RequestMTU, 0.1f);
                         });
                         break;
                     case States.RequestMTU:
@@ -140,7 +140,7 @@ public class BLEUDUManager : MonoBehaviour
                         break;
                     case States.Subscribe:
                         StatusMessage = "Subscribing to characteristics...";
-                        InitializeUDUConsole();
+                        SubscribeCharacteristicsSequentially();
                         break;
                     case States.Unsubscribe:
                         BluetoothLEHardwareInterface.UnSubscribeCharacteristic(_deviceAddress, UduGattUuid.ButtonsServiceUUID, UduGattUuid.ButtonEventCharacteristicUUID, (callbackText) =>
@@ -152,7 +152,7 @@ public class BLEUDUManager : MonoBehaviour
                             BluetoothLEHardwareInterface.UnSubscribeCharacteristic(_deviceAddress, UduGattUuid.TrackpadService, UduGattUuid.TrackpadCharacteristicUUID, null);
                         });
 
-                        SetState(States.Disconnect, 4f);
+                        SetState(States.Disconnect, 2f);
                         break;
                     case States.Disconnect:
                         StatusMessage = "Commanded disconnect.";
@@ -184,12 +184,13 @@ public class BLEUDUManager : MonoBehaviour
     #endregion
 
     #region BLE Connection: Notify characteristic subscription
-    private void SubscribeToButtonCharacteristic()
+    private void SubscribeToButtonCharacteristic(Action onComplete)
     {
         BluetoothLEHardwareInterface.SubscribeCharacteristicWithDeviceAddress(_deviceAddress, UduGattUuid.ButtonsServiceUUID, UduGattUuid.ButtonEventCharacteristicUUID, (notifyAddress, notifyCharacteristic) =>
         {
             _state = States.None;
             StatusMessage = "Subscribed to Button characteristic";
+            onComplete.Invoke(); // Callback to signal completion.
         }, (address, characteristicUUID, bytes) =>
         {
             if (_state != States.None)
@@ -208,7 +209,7 @@ public class BLEUDUManager : MonoBehaviour
         });
     }
 
-    private void SubscribeToTrackpadCharacteristic()
+    private void SubscribeToTrackpadCharacteristic(Action onComplete)
     {
         BluetoothLEHardwareInterface.SubscribeCharacteristicWithDeviceAddress(_deviceAddress, UduGattUuid.TrackpadService, UduGattUuid.TrackpadCharacteristicUUID, (notifyAddress, notifyCharacteristic) =>
         {
@@ -216,6 +217,7 @@ public class BLEUDUManager : MonoBehaviour
             string characteristicName;
             UduGattUuid.Lookup.TryGetValue(notifyCharacteristic, out characteristicName);
             StatusMessage = "Subscribed to: " + characteristicName;
+            onComplete.Invoke(); // Callback to signal completion.
         }, (address, characteristicUUID, bytes) =>
         {
             if (_state != States.None)
@@ -234,12 +236,12 @@ public class BLEUDUManager : MonoBehaviour
         });
     }
 
-    private void SubscribeToIMUCharacteristic()
+    private void SubscribeToIMUCharacteristic(Action onComplete)
     {
         BluetoothLEHardwareInterface.SubscribeCharacteristicWithDeviceAddress(_deviceAddress, UduGattUuid.IMUServiceUUID, UduGattUuid.IMUDataCharacteristicUUID, (notifyAddress, notifyCharacteristic) =>
         {
             StatusMessage = "Subscribed to IMU characteristic.";
-
+            onComplete.Invoke(); // Callback to signal completion.
         }, (address, characteristicUUID, bytes) =>
         {
             if (_state != States.None)
@@ -604,23 +606,30 @@ public class BLEUDUManager : MonoBehaviour
         return Connected;
     }
 
+    private void SubscribeCharacteristicsSequentially()
+    {
+        SubscribeToButtonCharacteristic(() =>
+        {
+            SubscribeToTrackpadCharacteristic(() =>
+            {
+                SubscribeToIMUCharacteristic(() =>
+                {
+                    InitializeUDUConsole();
+                });
+            });
+        });
+    }
+
     public void InitializeUDUConsole()
     {
-        Thread.Sleep(200);
-        SubscribeToIMUCharacteristic();
-        Thread.Sleep(300);
-        SubscribeToButtonCharacteristic();
-        Thread.Sleep(300);
-        SubscribeToTrackpadCharacteristic();
-        Thread.Sleep(300);
-        SubscribeToEdgeImpulseCharacteristic();
-        Thread.Sleep(300);
+        Connected = true;
+        ConsoleIntegration.Instance.isConnected = true;
+        
+        Thread.Sleep(100);
+        
         SetAmplitude(100);
 
         SetImageVibrationAndLEDs("/spiffs/snowballdisplay.gif", "/spiffs/Fruit150.wav", Color.green);
-
-        Connected = true;
-        ConsoleIntegration.Instance.isConnected = true;
     }
     #endregion
 
@@ -733,7 +742,7 @@ public class BLEUDUManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        SetState(States.Unsubscribe, 5f);
+        SetState(States.Unsubscribe, 2f);
     }
     #endregion
 }
