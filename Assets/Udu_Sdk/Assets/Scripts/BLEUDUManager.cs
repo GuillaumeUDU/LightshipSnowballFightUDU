@@ -629,7 +629,7 @@ public class BLEUDUManager : MonoBehaviour
         
         SetAmplitude(100);
 
-        SetImageVibrationAndLEDs("/spiffs/snowballdisplay.gif", "/spiffs/Fruit150.wav", Color.green);
+        SetImageVibrationAndLEDs("/spiffs/snowballdisplay.gif", "/spiffs/Fruit150.wav", Color.blue);
     }
     #endregion
 

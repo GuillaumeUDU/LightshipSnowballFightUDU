@@ -43,12 +43,5 @@ public class ConsoleIntegration : Singleton<ConsoleIntegration>
         connectingScreen.SetActive(false);
 
         Debug.Log("console is connected");
-
-        ModifyConsoleDisplay();
-    }
-
-    void ModifyConsoleDisplay()
-    {
-        uduConsoleDatastream.SetImageAndLEDs("/spiffs/snowballdisplay.gif", Color.white);
     }
 }
