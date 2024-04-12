@@ -3,6 +3,8 @@ using UnityEngine;
 using System;
 using Niantic.ARVoyage.SnowballToss;
 using Random = UnityEngine.Random;
+using UDU;
+using UnityEngine.UI;
 
 namespace Niantic.ARVoyage
 {
@@ -75,7 +77,6 @@ namespace Niantic.ARVoyage
 
 
         private AudioManager audioManager;
-        private AbstractDataStream uduConsole;
 
         public string SpawnerDescription { get; private set; }
 
@@ -88,8 +89,6 @@ namespace Niantic.ARVoyage
             audioManager = SceneLookup.Get<AudioManager>();
 
             ShowVFX(false);
-
-            uduConsole = ConsoleIntegration.Instance.uduConsoleDatastream;
         }
 
         private void Start()
@@ -176,16 +175,16 @@ namespace Niantic.ARVoyage
                 }
             }
 
-            ConsolePickAcceleration();
+            ControllerPickAcceleration();
             //Debug.Log("X: " + uduConsole.GetOrientation().eulerAngles.x);
         }
 
-        private void ConsolePickAcceleration()
+        private void ControllerPickAcceleration()
         {
             if (!triggerPressed) return;
 
             // Update the variable value
-            consoleCurrentAcceleration = uduConsole.GetAcceleration().magnitude;
+            consoleCurrentAcceleration = UDUGetters.GetAcceleration().magnitude;
 
             releasedTime = Time.time;
 
@@ -248,11 +247,11 @@ namespace Niantic.ARVoyage
         private void TossSnowball(float tossAngle, Vector3 force, Vector3 torque)
         {
 
-             float tiltThreshold = 20.0f; // Add this line to define the tilt threshold in degree
+            float tiltThreshold = 20.0f; // Add this line to define the tilt threshold in degree
 
-           
-            Quaternion currentOrientation = uduConsole.GetOrientation();
-           
+
+            Quaternion currentOrientation = UDUGetters.GetOrientation();
+
             // Convert the current orientation quaternion to a rotation matrix
             Matrix4x4 rotationMatrix = Matrix4x4.Rotate(currentOrientation);
 
@@ -282,7 +281,7 @@ namespace Niantic.ARVoyage
             this.transform.rotation = Quaternion.Euler(tossRotation);
 
             // This handle the power of the snowball on console acceleration
-            if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(uduConsole.GetAcceleration().magnitude));
+            if (releasedTime - peakTime > 1f) snowballRigidbody.AddForce(this.transform.forward * ConvertValue(UDUGetters.GetAcceleration().magnitude));
             else snowballRigidbody.AddForce(this.transform.forward * ConvertValue(consolePeakAcceleration));
 
 

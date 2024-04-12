@@ -1,7 +1,10 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using UDU;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace Niantic.ARVoyage.SnowballToss
@@ -611,7 +614,7 @@ namespace Niantic.ARVoyage.SnowballToss
 
         public IEnumerator SuccessRoutine(float duration = 1f, float delay = 0f)
         {
-            EventsSystemHandler.Instance.TriggerGettingPoints();
+            SetControllerOutputsAndThenReset();
 
             System.Action onStart = () =>
             {
@@ -663,6 +666,14 @@ namespace Niantic.ARVoyage.SnowballToss
                 null, onUpdate, onComplete);
         }
 
+        private void SetControllerOutputsAndThenReset()
+        {
+            UDUOutputs.SetImageVibrationAndLEDs("snowballdisplay.gif", "bskt_W.wav" /*"DV4_BA.wav"*/, Color.green);
+            // We display the base image and color again after 2 seconds
+
+            /// CHANGE FROM CONTROLLER INTERACTIONS
+            ControllerInteractions.Instance.SetOutputsAndInvokeToAnew("snowballdisplay.gif", "", Color.white);
+        }
 
         #region Debug
 
